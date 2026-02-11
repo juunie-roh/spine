@@ -1,6 +1,5 @@
-import { RuleConfigSeverity } from "@commitlint/types";
+import { RuleConfigSeverity, type UserConfig } from "@commitlint/types";
 
-/** @type {import('@commitlint/types').UserConfig} */
 export default {
   extends: ["@commitlint/config-conventional"],
   formatter: "@commitlint/format",
@@ -8,7 +7,6 @@ export default {
     "body-max-line-length": [RuleConfigSeverity.Warning, "always", 100],
     "subject-case": [RuleConfigSeverity.Warning, "always", "sentence-case"],
   },
-  /** @type {import('@commitlint/types').UserPromptConfig} */
   prompt: {
     questions: {
       type: {
@@ -72,4 +70,4 @@ export default {
       },
     },
   },
-};
+} satisfies UserConfig;
