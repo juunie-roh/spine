@@ -14,12 +14,7 @@ export default defineConfig({
     environment: "node",
     coverage: {
       include: ["src/**"],
-      exclude: [
-        "**/index.*",
-        "src/__tests__/**",
-        "**/__mocks__/**",
-        "**/*.test.*",
-      ],
+      exclude: ["**/index.*", "**/__mocks__/**", "**/*.test.*"],
     },
   },
 });
