@@ -1,15 +1,18 @@
 {
   "name": "@juun-roh/spine",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "bin": "dist/bin/index.js",
   "files": [
     "dist"
   ],
   "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsup",
     "check-types": "tsc -p ./tsconfig.json --noEmit",
+    "dev": "tsup --watch",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky"
@@ -22,7 +25,8 @@
     "access": "public"
   },
   "dependencies": {
-    "tree-sitter": "^0.25.0"
+    "commander": "^14.0.3",
+    "web-tree-sitter": "^0.26.5"
   },
   "peerDependencies": {
     "tree-sitter-typescript": ">=0.23.2"
@@ -33,6 +37,7 @@
     }
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.1",
     "@commitlint/cz-commitlint": "^20.4.1",
@@ -50,12 +55,19 @@
     "husky": "^9.1.7",
     "jiti": "^2.6.1",
     "tree-sitter-typescript": "^0.23.2",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
   "config": {
     "commitizen": {
       "path": "@commitlint/cz-commitlint"
+    }
+  },
+  "pnpm": {
+    "overrides": {
+      "tmp": ">=0.2.4",
+      "lodash": ">=4.17.23"
     }
   }
 }

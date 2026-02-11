@@ -11,7 +11,7 @@ export default defineConfig({
   test: {
     include: ["src/**/*.(test|spec).*"],
     exclude: ["**/node_modules/**"],
-    environment: "jsdom",
+    environment: "node",
     coverage: {
       include: ["src/**"],
       exclude: [
