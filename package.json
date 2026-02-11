@@ -1,0 +1,60 @@
+{
+  "name": "@juun-roh/spine",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "check-types": "tsc -p ./tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Juun",
+  "license": "MIT",
+  "packageManager": "pnpm@10.29.2",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "tree-sitter": "^0.25.0"
+  },
+  "peerDependencies": {
+    "tree-sitter-typescript": ">=0.23.2"
+  },
+  "peerDependenciesMeta": {
+    "tree-sitter-typescript": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
+    "@commitlint/cz-commitlint": "^20.4.1",
+    "@commitlint/format": "^20.4.0",
+    "@commitlint/types": "^20.4.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "eslint": "^10.0.0",
+    "eslint-plugin-jsdoc": "^62.5.4",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "husky": "^9.1.7",
+    "jiti": "^2.6.1",
+    "tree-sitter-typescript": "^0.23.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  }
+}

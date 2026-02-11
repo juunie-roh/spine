@@ -1,0 +1,20 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# build
+dist
+.tsup
+
+# test
+coverage
+
+# typescript
+*.tsbuildinfo
+
+# misc
+CLAUDE.md
+.claude
+.DS_Store
+*.pem
+.eslintcache
