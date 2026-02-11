@@ -1,16 +1,11 @@
-import { Parser } from "web-tree-sitter";
+import Parser, { Query } from "tree-sitter";
 
 const g = globalThis as unknown as { __parser?: Parser };
 
-export async function initParser(): Promise<Parser> {
-  await Parser.init();
-  g.__parser = new Parser();
-  return g.__parser;
-}
+export const parser = g.__parser ?? new Parser();
 
-export function getParser(): Parser {
-  if (!g.__parser) {
-    throw new Error("Parser not initialized. Call initParser() first.");
-  }
-  return g.__parser;
+export function query(node: Parser.SyntaxNode, queryString: string) {
+  const language = parser.getLanguage();
+  const query = new Query(language, queryString);
+  return query.matches(node);
 }

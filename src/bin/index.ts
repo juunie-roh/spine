@@ -2,7 +2,7 @@
 
 import { program } from "commander";
 
-import { initParser } from "@/core/parser";
+import { print } from "@/core/print";
 import parse from "@/typescript";
 
 import pkg from "../../package.json";
@@ -12,14 +12,11 @@ program
   .description(pkg.description)
   .argument("<file>", "a target file name to parse")
   .argument("[others...]", "additional files")
-  .hook("preAction", async () => {
-    await initParser();
-  })
   .action(async (file, others, options, command) => {
     console.log(file);
     others?.forEach((file: string) => console.log(file));
     const tree = await parse(file);
-    console.log(tree?.rootNode.toString());
+    print(tree);
   });
 
 program.parse(process.argv);
