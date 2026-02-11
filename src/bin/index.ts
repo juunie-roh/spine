@@ -2,16 +2,24 @@
 
 import { program } from "commander";
 
-import pkg from "../../package.json";
+import { initParser } from "@/core/parser";
+import parse from "@/typescript";
 
-const CWD = process.cwd();
+import pkg from "../../package.json";
 
 program
   .version(pkg.version)
   .description(pkg.description)
-  .argument("<file-name>", "file name")
-  .action((args) => {
-    console.log(args);
+  .argument("<file>", "a target file name to parse")
+  .argument("[others...]", "additional files")
+  .hook("preAction", async () => {
+    await initParser();
+  })
+  .action(async (file, others, options, command) => {
+    console.log(file);
+    others?.forEach((file: string) => console.log(file));
+    const tree = await parse(file);
+    console.log(tree?.rootNode.toString());
   });
 
 program.parse(process.argv);
