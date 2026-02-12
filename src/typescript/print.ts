@@ -1,6 +1,6 @@
 import Parser from "tree-sitter";
 
-import { query } from "./parser";
+import { query } from "@/core/parser";
 
 export function print(tree?: Parser.Tree) {
   if (tree) {
@@ -62,7 +62,7 @@ export function print(tree?: Parser.Tree) {
 
       // index metadata example:
       console.log({
-        id: match.captures.find((n) => n.name === "function.decl")?.node.id,
+        filepath: process.argv[2],
         type: "function declaration",
         data,
       });

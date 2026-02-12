@@ -12,3 +12,5 @@ export async function parse(file: string) {
   const source = readFileSync(file, "utf-8");
   return parser.parse(source);
 }
+
+export { print } from "./print";
