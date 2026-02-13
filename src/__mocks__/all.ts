@@ -69,6 +69,7 @@ let w: "a" | "b" = "a";
    Functions
 ========================= */
 function x(a: number, b = 1, ...c: number[]): number {
+  o();
   return a + b + c.length;
 }
 
@@ -91,20 +92,26 @@ type B<T extends number> = T;
    Classes
 ========================= */
 class C {
-  static a = 1;
-  readonly b: number;
-  private c: string;
-  protected d: boolean;
+  static static = 1;
+  readonly readonly: number;
+  private private: string;
+  protected protected: boolean;
 
   constructor(b: number, c: string, d: boolean) {
-    this.b = b;
-    this.c = c;
-    this.d = d;
+    this.readonly = b;
+    this.private = c;
+    this.protected = d;
   }
 
   e(): string {
-    return this.c;
+    return this.private;
   }
+
+  private private_method(this: C): this is number {
+    return typeof this === "number";
+  }
+
+  private static private_static_method = () => this.static;
 }
 
 class D extends C implements A {

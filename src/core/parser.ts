@@ -11,7 +11,7 @@ export const parser = g.__parser ?? new Parser();
  * Find nodes matching query
  * @param node a target node to look up
  * @param queryString S-expression query
- * @returns match nodes for query
+ * @returns matching nodes for query
  */
 export function query(node: Parser.SyntaxNode, queryString: string) {
   const language = parser.getLanguage();

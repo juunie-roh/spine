@@ -13,4 +13,4 @@ export async function parse(file: string) {
   return parser.parse(source);
 }
 
-export { print } from "./print";
+export { convert } from "./convert";
