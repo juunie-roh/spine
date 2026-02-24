@@ -1,0 +1,42 @@
+"github actions":
+  - changed-files:
+    - any-glob-to-any-file: ".github/**"
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: "**/*.md"
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "packages/**/package.json"
+
+test:
+  - changed-files:
+    - any-glob-to-any-file:
+      - "**/*.test.ts"
+      - "**/*.spec.ts"
+      - "vitest.config.*"
+      - "**/__mocks__/**"
+
+build:
+  - changed-files:
+    - any-glob-to-any-file:
+      - "tsup.config.*"
+      - "tsconfig*.json"
+      - "eslint.config.*"
+      - "commitlint.config.*"
+      - ".gitignore"
+      - ".npmignore"
+      - ".husky/**"
+
+core:
+  - changed-files:
+    - any-glob-to-any-file: "src/**"
+
+"plugin: typescript":
+  - changed-files:
+    - any-glob-to-any-file: "packages/typescript/**"
