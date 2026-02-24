@@ -23,12 +23,13 @@
     "node": "^22.13.0 || >=24"
   },
   "peerDependencies": {
-    "@juun-roh/spine": "workspace:*",
+    "@juun-roh/spine": "^0.0.0",
     "tree-sitter-javascript": ">=0.25.0",
     "tree-sitter-typescript": ">=0.23.2"
   },
   "devDependencies": {
-    "tree-sitter-typescript": ">=0.23.2",
+    "@juun-roh/spine": "workspace:*",
+    "tree-sitter-typescript": "^0.23.2",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }

@@ -9,11 +9,14 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["src/**/*.(test|spec).*"],
+    include: [
+      "src/**/*.(test|spec).*",
+      "packages/typescript/src/**/*.(test|spec).*",
+    ],
     exclude: ["**/node_modules/**"],
     environment: "node",
     coverage: {
-      include: ["src/**"],
+      include: ["src/**", "packages/typescript/src/**"],
       exclude: ["**/index.*", "**/__mocks__/**", "**/*.test.*"],
     },
   },
