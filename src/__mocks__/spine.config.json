@@ -1,0 +1,12 @@
+{
+  "plugin": [
+    {
+      "ext": ".ts",
+      "name": "@juun-roh/spine-typescript"
+    },
+    {
+      "ext": ".tsx",
+      "name": "@juun-roh/spine-tsx"
+    }
+  ]
+}

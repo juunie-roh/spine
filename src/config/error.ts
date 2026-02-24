@@ -1,3 +1,3 @@
-class ConfigError extends Error {}
+import { SpineError } from "@/shared/error";
 
-export default ConfigError;
+export class ConfigError extends SpineError {}
