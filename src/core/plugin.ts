@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-import TSParser from "tree-sitter";
+import TSParser, { Language } from "tree-sitter";
 
 import { CoreError } from "./error";
 
@@ -18,7 +18,7 @@ class Plugin {
   private _convert: any;
 
   constructor(packageName: string) {
-    const { language, convert, queryString } = Plugin._getPlugin(packageName);
+    const { language, convert, queryString } = Plugin.load(packageName);
     this._parser = new TSParser();
     this._language = language;
     this._parser.setLanguage(language);
@@ -43,9 +43,17 @@ class Plugin {
     const tree = this._parser.parse(source, oldTree, options);
     return this._convert(tree, this._query, file);
   }
+}
 
-  private static _getPlugin(name: string) {
-    let m: any;
+namespace Plugin {
+  export interface Module {
+    language: Language;
+    convert: any;
+    queryString: string;
+  }
+
+  export function load(name: string): Plugin.Module {
+    let m: Plugin.Module;
     try {
       m = require(name);
     } catch {

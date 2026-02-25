@@ -1,5 +1,3 @@
-import { Language } from "tree-sitter";
-
 interface Config {
   plugin: {
     ext: string;
@@ -7,10 +5,4 @@ interface Config {
   }[];
 }
 
-interface PluginConfig {
-  language: Language;
-  convert: any;
-  queryString: string;
-}
-
-export type { Config, PluginConfig };
+export type { Config };
