@@ -1,1 +1,1 @@
-export type * from "./node";
+export type * from "./base";
