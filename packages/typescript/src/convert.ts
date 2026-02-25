@@ -26,7 +26,7 @@ type ClassHit = {
   body: Parser.SyntaxNode;
 };
 
-export function convert(tree: Parser.Tree, query: Query) {
+export function convert(tree: Parser.Tree, query: Query, file: string) {
   const root = tree.rootNode;
 
   const functions: FuncHit[] = [];
@@ -100,8 +100,6 @@ export function convert(tree: Parser.Tree, query: Query) {
     const owner = findInnermostOwner(functions, call);
     if (owner) owner.calls.push(call);
   }
-
-  const file = process.argv[2];
 
   const functionNodes = functions.map((fn) => ({
     file,

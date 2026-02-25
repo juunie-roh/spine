@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import TSParser from "tree-sitter";
 
 /**
@@ -31,12 +33,13 @@ class Plugin {
   }
 
   parse(
-    source: string,
+    file: string,
     oldTree?: TSParser.Tree | null,
     options?: TSParser.Options,
   ) {
+    const source = readFileSync(file, "utf-8");
     const tree = this._parser.parse(source, oldTree, options);
-    return this._convert(tree, this._query);
+    return this._convert(tree, this._query, file);
   }
 }
 

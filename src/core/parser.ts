@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import type TSParser from "tree-sitter";
@@ -47,9 +46,7 @@ class Parser {
     if (!this._plugins.has(ext))
       throw new CoreError("Unsupported language: no available plugin found");
 
-    const source = readFileSync(file, "utf-8");
-
-    return this._plugins.get(ext)!.parse(source, oldTree, options);
+    return this._plugins.get(ext)!.parse(file, oldTree, options);
   }
 }
 
