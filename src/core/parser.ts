@@ -20,7 +20,7 @@ class Parser {
     });
   }
 
-  static get(config?: Config): Parser {
+  public static get(config?: Config): Parser {
     if (!this._instance) {
       if (!config)
         throw new CoreError(
@@ -34,11 +34,11 @@ class Parser {
     return this._instance;
   }
 
-  get plugin() {
+  public get plugin() {
     return this._plugins;
   }
 
-  parse(
+  public parse(
     file: string,
     oldTree?: TSParser.Tree | null,
     options?: TSParser.Options,
@@ -59,6 +59,11 @@ class Parser {
         { cause: e },
       );
     }
+  }
+
+  public destroy(): void {
+    this._plugins.clear();
+    Parser._instance = undefined;
   }
 }
 
