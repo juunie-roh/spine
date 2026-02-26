@@ -24,7 +24,7 @@ class Parser {
    * @param config Required on first call to initialize the parser; ignored thereafter.
    * @throws If called for the first time without a config.
    */
-  public static get(config?: Config): Parser {
+  static get(config?: Config): Parser {
     if (!this._instance) {
       if (!config)
         throw new CoreError(
@@ -51,7 +51,7 @@ class Parser {
    * @param options Parsing options passed to tree-sitter.
    * @throws If no language is registered for the file's extension.
    */
-  public parse(
+  parse(
     filePath: string,
     oldTree?: TSParser.Tree | null,
     options?: TSParser.Options,
@@ -72,7 +72,7 @@ class Parser {
   /**
    * Cleans up resources and resets the singleton instance.
    */
-  public destroy(): void {
+  destroy(): void {
     this._languages.clear();
     Parser._instance = undefined;
   }

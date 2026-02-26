@@ -38,7 +38,7 @@ class Language {
   }
 
   /**
-   * Parses a source file to the {@link TSParser.Tree | tree-sitter syntax tree}.
+   * Parses a source file to the {@link TSParser.Tree | tree-sitter `Tree`}.
    * @param filePath Path to the source file to parse.
    * @param oldTree Previous tree for incremental parsing.
    * @param options Parsing options passed to tree-sitter.
@@ -62,7 +62,7 @@ class Language {
   }
 
   convert(filePath: string, node: TSParser.SyntaxNode) {
-    return this._module.convert(node, this._query, filePath);
+    return this._module.capture(node, this._query, filePath);
   }
 }
 
@@ -72,9 +72,8 @@ namespace Language {
    */
   export interface Module {
     language: TSParser.Language;
-    capture: any;
-    convert: any;
     queryString: string;
+    [k: string]: any;
   }
 
   /**
@@ -112,8 +111,6 @@ namespace Language {
       typeof m === "object" &&
       m !== null &&
       "language" in m &&
-      "capture" in m &&
-      "convert" in m &&
       "queryString" in m &&
       typeof (m as Language.Module).queryString === "string"
     );
