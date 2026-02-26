@@ -18,15 +18,15 @@ program
     "specify path of configuration",
     "spine.config.json",
   )
-  .action(async (file, others, options, command) => {
+  .action((file, others, options, command) => {
     const config = loadConfig(options.path);
     const parser = Parser.get(config);
     const tree = parser.parse(file);
-    console.log(tree);
+    // console.log(tree);
 
     if (others) {
       others.forEach((f: string) => {
-        console.log(parser.parse(f));
+        // console.log(parser.parse(f));
       });
     }
   });
