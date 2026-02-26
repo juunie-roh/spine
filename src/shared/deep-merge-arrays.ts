@@ -1,7 +1,7 @@
 /**
- * Check if the variable contains an object strictly rejecting arrays
- * @param value an object
- * @returns Whether value is an object
+ * Check if the variable contains an object strictly rejecting arrays.
+ * @param value An object.
+ * @returns Whether value is an object.
  */
 function isObjectNotArray(value: unknown): boolean {
   return typeof value === "object" && value !== null && !Array.isArray(value);

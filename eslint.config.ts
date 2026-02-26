@@ -50,6 +50,10 @@ const others: Config["rules"] = {
   "unused-imports/no-unused-imports": "error",
   "unused-imports/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
   "consistent-return": "off",
+
+  "jsdoc/require-description-complete-sentence": "warn",
+  "jsdoc/require-asterisk-prefix": "warn",
+  "jsdoc/sort-tags": "warn",
 };
 
 export default defineConfig([
@@ -62,6 +66,7 @@ export default defineConfig([
   {
     files: ["**/*.{js,ts}"],
     ...eslint.configs.recommended,
+    ...jsdoc.configs["flat/recommended-typescript"],
     plugins: {
       jsdoc,
       prettier,

@@ -24,20 +24,25 @@ class Language {
     this._query = new TSParser.Query(language, queryString);
     this._convert = convert;
   }
-  /** The {@link TSParser.Language `Language`} instance used by this plugin */
+
+  /**
+   * The {@link TSParser.Language | tree-sitter `Language`} instance used by this plugin.
+   */
   get language() {
     return this._language;
   }
-  /** The {@link TSParser.Query `Query`} instance used by this plugin */
+  /**
+   * The {@link TSParser.Query | tree-sitter `Query`} instance used by this plugin.
+   */
   get query() {
     return this._query;
   }
 
   /**
    * Parses a source file and converts the syntax tree using the plugin's converter.
-   * @param file Path to the source file to parse
-   * @param oldTree Previous tree for incremental parsing
-   * @param options Parsing options passed to tree-sitter
+   * @param file - Path to the source file to parse.
+   * @param oldTree - Previous tree for incremental parsing.
+   * @param options - Parsing options passed to tree-sitter.
    */
   parse(
     file: string,
@@ -52,7 +57,7 @@ class Language {
 
 namespace Language {
   /**
-   * Plugin package module interface
+   * Plugin package module interface.
    */
   export interface Module {
     language: TSParser.Language;
@@ -61,10 +66,11 @@ namespace Language {
   }
 
   /**
-   * @param name The npm package name of the plugin
-   * @returns The resolved module containing language, query string, and converter
-   * @throws If the package cannot be found under `node_modules`
-   * @throws If the loaded module is incompatible with {@link Language.Module}
+   * Loads a language module with the name provided.
+   * @param name The npm package name of the plugin.
+   * @returns The resolved module containing language, query string, and converter.
+   * @throws If the package cannot be found under `node_modules`.
+   * @throws If the loaded module is incompatible with {@link Language.Module | language module}.
    */
   export function load(name: string): Module {
     let m: Module;

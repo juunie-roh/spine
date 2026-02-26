@@ -21,8 +21,8 @@ class Parser {
 
   /**
    * Returns the singleton instance, creating it on first call.
-   * @param config Required on first call to initialize the parser; ignored thereafter
-   * @throws If called for the first time without a config
+   * @param config Required on first call to initialize the parser; ignored thereafter.
+   * @throws If called for the first time without a config.
    */
   public static get(config?: Config): Parser {
     if (!this._instance) {
@@ -37,18 +37,20 @@ class Parser {
 
     return this._instance;
   }
-  /** {@link Language `Language`} instances keyed by file extension. */
+  /**
+   * {@link Language | spine `Language`} instances keyed by file extension.
+   * */
   public get languages() {
     return this._languages;
   }
 
   /**
    * Parses a source file using the language registered for its file extension.
-   * @param file Path to the source file to parse
-   * @param oldTree Previous tree for incremental parsing
-   * @param options Parsing options passed to tree-sitter
-   * @throws If no language is registered for the file's extension
-   * @throws If the language fails to parse the file
+   * @param file Path to the source file to parse.
+   * @param oldTree Previous tree for incremental parsing.
+   * @param options Parsing options passed to tree-sitter.
+   * @throws If no language is registered for the file's extension.
+   * @throws If the language fails to parse the file.
    */
   public parse(
     file: string,
@@ -74,7 +76,7 @@ class Parser {
   }
 
   /**
-   * Cleans up resources and resets the singleton instance
+   * Cleans up resources and resets the singleton instance.
    */
   public destroy(): void {
     this._languages.clear();
