@@ -1,4 +1,4 @@
-import type { Range } from "tree-sitter";
+import type TSParser from "tree-sitter";
 
 interface Node {
   /**
@@ -12,9 +12,9 @@ interface Node {
   kind: string;
   /**
    * A range of positions in a multi-line text document, specified both in terms of byte offsets and row/column positions.
-   * @see {@link Range | tree-sitter `Range`}
+   * @see {@link TSParser.Range | tree-sitter `Range`}
    */
-  range: Range;
+  range?: TSParser.Range;
   /**
    * Outgoing edges connecting this node to related nodes.
    */
