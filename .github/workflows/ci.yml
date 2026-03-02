@@ -47,7 +47,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build packages
-        run: pnpm -r build && pnpm build
+        run: pnpm build && pnpm -r build
       - name: Check types
         run: pnpm -r check-types && pnpm check-types
       - name: Run linter
