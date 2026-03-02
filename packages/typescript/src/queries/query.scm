@@ -6,54 +6,19 @@
 ;; TODO: discriminate type imports
 (import_statement
   (import_clause
-    (named_imports
-      (import_specifier
-        name: (identifier) @name
-        alias: (identifier)? @alias
-      )
-    )?
-    (namespace_import
-      (identifier) @name
-    )?
-    (identifier)? @name
-  )?
+    ;; (named_imports
+    ;;   (import_specifier
+    ;;     name: (identifier) @name
+    ;;     alias: (identifier)? @alias
+    ;;   )
+    ;; )?
+    ;; (namespace_import
+    ;;   (identifier) @name
+    ;; )?
+    ;; (identifier)? @name
+  )? @names
   source: (string (_) @source)
 ) @import
-
-;; exports
-[
-  ;; export { @name, @name as @alias, type @name, type @name as @alias };
-  ;; export type { @name, @name as @alias };
-  (export_statement
-    (export_clause
-      (export_specifier
-        name: (identifier) @name
-        alias: (identifier)? @alias
-      )?
-    )
-    !source
-    !value
-    !declaration
-  ) @export.named
-  ;; export * from "@source";
-  ;; export type * from "@source";
-  ;; export { @name, @name as @alias, type @name, type @name as @alias } from "@source";
-  ;; export type { @name, @name as @alias } from "@source";
-  (export_statement
-    (export_clause
-      (export_specifier
-        name: (identifier) @name
-        alias: (identifier)? @alias
-      )?
-    )?
-    source: (string (_) @source)
-  ) @export.re
-  ;; export default @value;
-  (export_statement
-    "default"
-    value: (_) @value
-  ) @export.anonymous
-] @export
 
 (call_expression) @call
 
@@ -136,4 +101,39 @@
   )? @heritage
   type_parameters: (type_parameters (_) @generics)?
   body: (class_body (_) @body)
-) @abstract-class
+) @abstract_class
+
+;; ;; exports
+;; [
+;;   ;; export { @name, @name as @alias, type @name, type @name as @alias };
+;;   ;; export type { @name, @name as @alias };
+;;   (export_statement
+;;     (export_clause
+;;       (export_specifier
+;;         name: (identifier) @name
+;;         alias: (identifier)? @alias
+;;       )?
+;;     )
+;;     !source
+;;     !value
+;;     !declaration
+;;   ) @export.named
+;;   ;; export * from "@source";
+;;   ;; export type * from "@source";
+;;   ;; export { @name, @name as @alias, type @name, type @name as @alias } from "@source";
+;;   ;; export type { @name, @name as @alias } from "@source";
+;;   (export_statement
+;;     (export_clause
+;;       (export_specifier
+;;         name: (identifier) @name
+;;         alias: (identifier)? @alias
+;;       )?
+;;     )?
+;;     source: (string (_) @source)
+;;   ) @export.re
+;;   ;; export default @value;
+;;   (export_statement
+;;     "default"
+;;     value: (_) @value
+;;   ) @export.anonymous
+;; ] @export
