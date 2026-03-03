@@ -14,7 +14,7 @@ namespace Capture {
   export interface Function extends Base {
     type_params: string[];
     params: string[];
-    return_type: string;
+    return_type?: string;
   }
 
   export interface Call extends Base {}
