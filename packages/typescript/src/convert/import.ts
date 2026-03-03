@@ -2,7 +2,7 @@ import type { Capture, Edge, Node } from "@/models";
 
 function convertImports(
   imports: Capture.Import[],
-  filePath: string,
+  parentId: string,
 ): {
   edges: Edge[];
   nodes: Node[];
@@ -19,7 +19,7 @@ function convertImports(
     };
 
     edges.push({
-      from: filePath,
+      from: parentId,
       to: imp.source,
       kind: "imports",
     } satisfies Edge);

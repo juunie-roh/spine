@@ -8,7 +8,7 @@ import { getMatches, getNode, groupMatches } from "./utils";
 function getFunctions(
   node: TSParser.SyntaxNode,
   query: TSParser.Query,
-  filePath: string,
+  parentId: string,
 ): Capture.Function[] {
   const matches = getMatches(query, node);
 
@@ -16,7 +16,7 @@ function getFunctions(
     const get = (name: string) => getNode(name, match);
 
     const name = get("name")?.text;
-    const id = `${filePath}:function:${name}`;
+    const id = `${parentId}:function:${name}`;
 
     return {
       id,

@@ -37,7 +37,7 @@ function parseNames(
 function getImports(
   node: TSParser.SyntaxNode,
   query: TSParser.Query,
-  filePath: string,
+  parentId: string,
 ): Capture.Import[] {
   const matches = getMatches(query, node);
 
@@ -45,7 +45,7 @@ function getImports(
     const get = (name: string) => getNode(name, match);
 
     return {
-      id: filePath,
+      id: parentId,
       node: get("import")!,
       names: get("names")?.namedChildren.flatMap(parseNames),
       source: get("source")!.firstNamedChild!.text,

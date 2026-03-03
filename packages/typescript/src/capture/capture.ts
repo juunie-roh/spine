@@ -8,11 +8,11 @@ import { getImports } from "./import";
 function capture(
   node: TSParser.SyntaxNode,
   query: TSParser.Query,
-  filePath: string,
+  parentId: string,
 ): Capture.Result {
   return {
-    imports: getImports(node, query, filePath),
-    functions: getFunctions(node, query, filePath),
+    imports: getImports(node, query, parentId),
+    functions: getFunctions(node, query, parentId),
   };
 }
 
