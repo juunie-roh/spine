@@ -10,7 +10,9 @@ type SpineErrorCode =
   | "CORE_PLUGIN_LOAD_FAILED"
   | "CORE_PLUGIN_PARSE_FAILED"
   // graph
-  | "GRAPH_NO_NODE";
+  | "GRAPH_NO_NODE"
+  | "GRAPH_UNRESOLVED_EDGE"
+  | "GRAPH_EDGE_RESOLUTION_FAILED";
 
 class SpineError extends Error {
   readonly code: SpineErrorCode;
@@ -19,7 +21,7 @@ class SpineError extends Error {
     super(message, options);
     this.name = this.constructor.name;
     this.code = code;
-    console.error(`[${this.name}] ${code}: ${message}`);
+    console.error(`[${code}] ${message}`);
   }
 }
 
