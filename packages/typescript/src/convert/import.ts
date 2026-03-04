@@ -28,7 +28,7 @@ function convertImports(
       id: imp.source,
       kind: "module",
       range,
-      meta: { names: imp.names },
+      props: { names: imp.names },
     } satisfies Node);
   }
 

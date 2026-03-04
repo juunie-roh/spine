@@ -1,7 +1,7 @@
 import type * as Spine from "@juun-roh/spine";
 
 // TODO: specify other declaration kinds
-type NodeKind = "module" | "function" | "class" | "abstract_class";
+type NodeKind = "file" | "module" | "function" | "class" | "abstract_class";
 
 /**
  * Override {@link Spine.Node | `Node`}'s `kind` with language specific {@link NodeKind | kinds of node}.
