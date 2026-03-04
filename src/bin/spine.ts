@@ -4,6 +4,7 @@ import { program } from "commander";
 
 import { loadConfig } from "@/config";
 import { Parser } from "@/core";
+import { Graph } from "@/core/graph";
 
 import pkg from "../../package.json";
 
@@ -21,21 +22,12 @@ program
   .action((file, others, options, command) => {
     const config = loadConfig(options.path);
     const parser = Parser.get(config);
-    const tree = parser.parse(file);
-    console.log(`Edges: ${tree.edges.length}, Nodes: ${tree.nodes.length}`);
-    tree.edges.forEach((e) => {
-      console.log(`[EDGE]: ${e.from} ==== ${e.kind} ====> ${e.to}`);
-    });
-    tree.nodes.forEach((n) => {
-      console.log("====== [NODE] ======");
-      console.log(`ID:       ${n.id}`);
-      console.log(`NodeKind: ${n.kind}`);
-      console.log(`byte:     ${n.range.startIndex} to ${n.range.endIndex}`);
-      console.log(
-        `position: ${n.range.startPosition.row}:${n.range.startPosition.column} to ${n.range.endPosition.row}:${n.range.endPosition.column}`,
-      );
-      console.log(`meta:     ${n.meta ? JSON.stringify(n.meta) : "undefined"}`);
-    });
+    const { nodes, edges } = parser.parse(file);
+    // add root file node once
+    nodes.push({ id: file, kind: "file" });
+
+    const graph = Graph.build(nodes, edges);
+    console.log(graph.serialize());
 
     if (others) {
       others.forEach((f: string) => {
