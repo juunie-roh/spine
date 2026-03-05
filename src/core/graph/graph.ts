@@ -117,7 +117,13 @@ class Graph {
     }
 
     const adjacentNodes = this._adjacent(from);
-    defined(adjacentNodes);
+    defined(
+      adjacentNodes,
+      new GraphError(
+        "GRAPH_UNDEFINED_INSTANCE",
+        `No adjacency map found for node: ${from}`,
+      ),
+    );
 
     if (!adjacentNodes.has(to)) {
       adjacentNodes.set(to, new Set());
@@ -191,7 +197,13 @@ class Graph {
     }
 
     const fromMap = this._edgeProps.get(from);
-    defined(fromMap);
+    defined(
+      fromMap,
+      new GraphError(
+        "GRAPH_UNDEFINED_INSTANCE",
+        `No edge properties map found for node: ${from}`,
+      ),
+    );
 
     if (!fromMap.has(to)) {
       fromMap.set(to, new Map());

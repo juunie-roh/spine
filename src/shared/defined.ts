@@ -1,12 +1,13 @@
-function defined(value: boolean, message?: string): asserts value;
+import { SpineError } from "./error";
+
+function defined(value: boolean, error?: SpineError): asserts value;
 function defined<T>(
   value: T | null | undefined,
-  message?: string,
+  error?: SpineError,
 ): asserts value is T;
-function defined(value: any, message?: string) {
+function defined(value: any, error?: SpineError) {
   if (value === false || value === null || typeof value === "undefined") {
-    console.warn("Not defined:", message);
-    throw new Error(message);
+    throw error ?? new Error("Unspecified undefined error");
   }
 }
 

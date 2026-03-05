@@ -12,7 +12,8 @@ type SpineErrorCode =
   // graph
   | "GRAPH_NO_NODE"
   | "GRAPH_UNRESOLVED_EDGE"
-  | "GRAPH_EDGE_RESOLUTION_FAILED";
+  | "GRAPH_EDGE_RESOLUTION_FAILED"
+  | "GRAPH_UNDEFINED_INSTANCE";
 
 class SpineError extends Error {
   readonly code: SpineErrorCode;
