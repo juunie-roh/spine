@@ -5,6 +5,10 @@ function outer_function() {
   function inner_function_1() {}
   function inner_function_2() {}
   function inner_function_3() {}
+
+  function_declaration();
+  assigned_function();
+  arrow_function();
 }
 
 const assigned_function = function () {};
