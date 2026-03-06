@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [22.x]  # drop 24.x, 25.x — no prebuilt tree-sitter binaries
+        node-version: [22.x, 24.x, 25.x]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -45,6 +45,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+          CXXFLAGS: -std=c++20
 
       - name: Build packages
         run: pnpm build && pnpm -r build
