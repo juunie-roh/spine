@@ -30,13 +30,13 @@ function toDot(graph: Graph, name = "spine"): string {
       const childChildren = scopeChildren.get(child);
       const hasChildren = (childChildren?.size ?? 0) > 0;
       const isNode = graph.nodes.has(child);
-      const label = child.split(":").pop()!;
+      const node = isNode ? graph.nodes.get(child) : undefined;
+      const label = node?.kind === "module" ? child : child.split(":").pop()!;
 
       if (hasChildren || child.includes(":")) {
         lines.push(`${indent}subgraph ${JSON.stringify("cluster_" + child)} {`);
         lines.push(`${indent}  label=${JSON.stringify(label)};`);
-        if (isNode) {
-          const node = graph.nodes.get(child)!;
+        if (node) {
           const nodeLabel = `<${node.kind}>\n${label}`;
           lines.push(
             `${indent}  ${JSON.stringify(child)} [label=${JSON.stringify(nodeLabel)}, group=${JSON.stringify(node.kind)}];`,
@@ -44,8 +44,7 @@ function toDot(graph: Graph, name = "spine"): string {
         }
         renderScope(child, indent + "  ");
         lines.push(`${indent}}`);
-      } else if (isNode) {
-        const node = graph.nodes.get(child)!;
+      } else if (node) {
         const nodeLabel = `<${node.kind}>\n${label}`;
         lines.push(
           `${indent}${JSON.stringify(child)} [label=${JSON.stringify(nodeLabel)}, group=${JSON.stringify(node.kind)}];`,

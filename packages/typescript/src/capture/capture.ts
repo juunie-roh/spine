@@ -6,15 +6,11 @@ import { getClasses } from "./class";
 import { getFunctions } from "./function";
 import { getImports } from "./import";
 
-function capture(
-  node: TSParser.SyntaxNode,
-  query: TSParser.Query,
-  parentId: string,
-): Capture.Result {
+function capture(node: TSParser.SyntaxNode, parentId: string): Capture.Result {
   return {
-    imports: getImports(node, query, parentId),
-    functions: getFunctions(node, query, parentId),
-    classes: getClasses(node, query, parentId),
+    imports: getImports(node, parentId) ?? [],
+    functions: getFunctions(node, parentId) ?? [],
+    classes: getClasses(node, parentId) ?? [],
   };
 }
 

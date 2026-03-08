@@ -1,18 +1,61 @@
 import type TSParser from "tree-sitter";
 
 import { Capture } from "@/models";
+import { query } from "@/queries";
 
 import { capture } from "./capture";
 import { getMatches, getNode, groupMatches } from "./utils";
 
+function getClassBody(
+  node: TSParser.SyntaxNode,
+  parentId: string,
+): Capture.ClassBody | undefined {
+  const matches = getMatches(query.get("class_body"), node);
+
+  const methods = groupMatches("method", matches).map((match) => {
+    const get = (name: string) => getNode(name, match);
+    const name = get("name")!.text;
+
+    const id = `${parentId}:${name}`;
+
+    return {
+      id,
+      node: get("method")!,
+      body: capture(get("body")!, id),
+      name,
+      modifier: get("modifier")?.text,
+      is_static: get("is_static") !== undefined,
+      type_params: get("type_params")?.namedChildren.map((c) => c.text) ?? [],
+      params: get("params")?.namedChildren.map((c) => c.text) ?? [],
+      return_type: get("return_type")?.text,
+    } satisfies Capture.Method;
+  });
+
+  const fields = groupMatches("field", matches).map((match) => {
+    const get = (name: string) => getNode(name, match);
+    const name = get("name")!.text;
+
+    return {
+      id: `${parentId}:${name}`,
+      node: get("field")!,
+      name,
+      modifier: get("modifier")?.text,
+      is_static: get("is_static") !== undefined,
+      type: get("type")?.text,
+      value: get("value")?.text,
+    } satisfies Capture.Field;
+  });
+
+  return { methods, fields };
+}
+
 function getClasses(
   node: TSParser.SyntaxNode,
-  query: TSParser.Query,
   parentId: string,
-): Capture.Class[] {
-  const matches = getMatches(query, node);
+): Capture.Class[] | undefined {
+  const matches = getMatches(query.get("class"), node);
 
-  return groupMatches("class", matches).map((match) => {
+  return matches.map((match) => {
     const get = (name: string) => getNode(name, match);
 
     const name = get("name")!.text;
@@ -22,7 +65,7 @@ function getClasses(
     return {
       id,
       node: get("class")!,
-      body: capture(get("body")!, query, id),
+      body: getClassBody(get("body")!, id)!,
       name,
 
       type_params: get("type_params")?.namedChildren.map((c) => c.text) ?? [],
@@ -38,4 +81,4 @@ function getClasses(
   });
 }
 
-export { getClasses };
+export { getClassBody, getClasses };

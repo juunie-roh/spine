@@ -1,6 +1,7 @@
 import type TSParser from "tree-sitter";
 
 import { Capture } from "@/models";
+import { query } from "@/queries";
 
 import { getMatches, getNode, groupMatches } from "./utils";
 
@@ -21,10 +22,9 @@ function parseType(node?: TSParser.SyntaxNode): Capture.Import["type"] {
 
 function getImports(
   node: TSParser.SyntaxNode,
-  query: TSParser.Query,
   parentId: string,
 ): Capture.Import[] {
-  const matches = getMatches(query, node);
+  const matches = getMatches(query.get("import"), node);
 
   return groupMatches("import", matches).map((match) => {
     const get = (name: string) => getNode(name, match);

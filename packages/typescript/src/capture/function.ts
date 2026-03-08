@@ -1,18 +1,18 @@
 import type TSParser from "tree-sitter";
 
 import { Capture } from "@/models";
+import { query } from "@/queries";
 
 import { capture } from "./capture";
-import { getMatches, getNode, groupMatches } from "./utils";
+import { getMatches, getNode } from "./utils";
 
 function getFunctions(
   node: TSParser.SyntaxNode,
-  query: TSParser.Query,
   parentId: string,
-): Capture.Function[] {
-  const matches = getMatches(query, node);
+): Capture.Function[] | undefined {
+  const matches = getMatches(query.get("function"), node);
 
-  return groupMatches("function", matches).map((match) => {
+  return matches.map((match) => {
     const get = (name: string) => getNode(name, match);
 
     const name = get("name")!.text;
@@ -21,7 +21,7 @@ function getFunctions(
     return {
       id,
       node: get("function")!,
-      body: capture(get("body")!, query, id),
+      body: capture(get("body")!, id),
       name,
 
       type_params: get("type_params")?.namedChildren.map((c) => c.text) ?? [],

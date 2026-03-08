@@ -1,5 +1,7 @@
 import type TSParser from "tree-sitter";
 
+import { QueryTag } from "@/models";
+
 /**
  * Get 1-depth children of a given node.
  */
@@ -23,7 +25,7 @@ function getMatches(
  * Group the matches by a tag.
  */
 function groupMatches(
-  by: string,
+  by: QueryTag | string,
   from: TSParser.QueryMatch[],
 ): TSParser.QueryMatch[] {
   return from.filter((match) =>

@@ -1,5 +1,5 @@
 ;; function declaration
-;; function @name<@type_params>(@params): s@return_type @body
+;; function @name<@type_params>(@params): @return_type @body
 (function_declaration
   name: (identifier) @name
   type_parameters: (type_parameters)? @type_params

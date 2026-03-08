@@ -7,6 +7,8 @@ type NodeKind =
   | "function"
   | "class"
   | "abstract_class"
+  | "method"
+  | "field"
   | "variable";
 
 /**
@@ -24,4 +26,6 @@ type Edge = Spine.Edge<EdgeKind>;
 
 type Graph = Spine.Graph<Node, Edge>;
 
-export type { Edge, EdgeKind, Graph, Node, NodeKind };
+type QueryTag = "function" | "import" | "class" | "class_body" | "params";
+
+export type { Edge, EdgeKind, Graph, Node, NodeKind, QueryTag };

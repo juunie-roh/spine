@@ -19,8 +19,29 @@ namespace Capture {
 
   export interface Call extends Base {}
 
-  export interface Class extends Base {
+  export interface Method extends Base {
     body: Result;
+    modifier?: string;
+    is_static: boolean;
+    type_params: string[];
+    params: string[];
+    return_type?: string;
+  }
+
+  export interface Field extends Base {
+    modifier?: string;
+    is_static: boolean;
+    type?: string;
+    value?: string;
+  }
+
+  export interface ClassBody {
+    methods: Method[];
+    fields: Field[];
+  }
+
+  export interface Class extends Base {
+    body: ClassBody;
     type_params: string[];
     implements: string[];
     extends: string[];
