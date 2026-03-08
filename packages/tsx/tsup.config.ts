@@ -1,4 +1,4 @@
-import { scmPlugin } from "@juun-roh/spine/utils/query";
+import { scmPlugin } from "@juun-roh/spine/query";
 import { defineConfig } from "tsup";
 
 export default defineConfig({
