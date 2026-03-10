@@ -1,66 +1,64 @@
-import { createNodeId } from "@juun-roh/spine/utils";
+import { createCanonicalId } from "@juun-roh/spine/utils";
 import type TSParser from "tree-sitter";
 
 import { Capture } from "@/models";
 
 import { capture } from "./capture";
 import { query } from "./query";
-import { getMatches, getNode, groupMatches } from "./utils";
+import { createGetter, getMatches, getNode } from "./utils";
 
-function getClassBody(
-  node: TSParser.SyntaxNode,
-  parentId: string,
-): Capture.ClassBody | undefined {
-  const matches = getMatches(query.get("class_body"), node);
+function getClassBody(node: TSParser.SyntaxNode, parentId: string) {
+  const methodMatches = getMatches(query.get("method"), node);
+  const memberMatches = getMatches(query.get("member"), node);
 
-  const methods = groupMatches("method", matches).map((match) => {
-    const get = (name: string) => getNode(name, match);
-    const name = get("name")!.text;
+  const methods = methodMatches.map((match) => {
+    const get = createGetter<"method">(match);
 
-    const id = createNodeId(parentId, name);
+    const name = get("name").text;
+    const id = createCanonicalId(parentId, name);
 
     return {
       id,
-      node: get("method")!,
-      body: capture(get("body")!, id),
+      node: get("method"),
+      body: capture(get("body"), id),
       name,
       modifier: get("modifier")?.text ?? "public",
       is_static: get("is_static") !== undefined,
       type_params: get("type_params")?.namedChildren.map((c) => c.text) ?? [],
-      params: get("params")?.namedChildren.map((c) => c.text) ?? [],
+      params: get("params").namedChildren.map((c) => c.text) ?? [],
       return_type: get("return_type")?.text,
-    } satisfies Capture.Method;
+    } satisfies Capture<"method">;
   });
 
-  const fields = groupMatches("field", matches).map((match) => {
-    const get = (name: string) => getNode(name, match);
-    const name = get("name")!.text;
+  const members = memberMatches.map((match) => {
+    const get = createGetter<"member">(match);
+
+    const name = get("name").text;
 
     return {
-      id: createNodeId(parentId, name),
-      node: get("field")!,
+      id: createCanonicalId(parentId, name),
+      node: get("member"),
       name,
       modifier: get("modifier")?.text,
       is_static: get("is_static") !== undefined,
       type: get("type")?.text,
-      value: get("value")?.text,
-    } satisfies Capture.Field;
+    } satisfies Capture<"member">;
   });
 
-  return { methods, fields };
+  return { methods, members };
 }
 
 function getClasses(
   node: TSParser.SyntaxNode,
   parentId: string,
-): Capture.Class[] | undefined {
+): Capture<"class">[] {
   const matches = getMatches(query.get("class"), node);
 
   return matches.map((match) => {
     const get = (name: string) => getNode(name, match);
 
     const name = get("name")!.text;
-    const id = createNodeId(parentId, name);
+    const id = createCanonicalId(parentId, name);
     const heritage = get("heritage");
 
     return {
@@ -78,7 +76,7 @@ function getClasses(
         heritage?.namedChildren
           ?.find((f) => f.type === "extends_clause")
           ?.namedChildren.map((c) => c.text) ?? [],
-    } satisfies Capture.Class;
+    } satisfies Capture<"class">;
   });
 }
 

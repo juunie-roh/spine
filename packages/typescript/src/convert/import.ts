@@ -1,7 +1,9 @@
+import { createCanonicalId } from "@juun-roh/spine/utils";
+
 import type { Capture, Edge, Node } from "@/models";
 
 function convertImports(
-  captures: Capture.Import[],
+  captures: Capture<"import">[],
   parentId: string,
 ): {
   edges: Edge[];
@@ -13,15 +15,15 @@ function convertImports(
 
   for (const captured of captures) {
     const { source, name, type, alias } = captured;
-    if (!sources.has(source)) {
-      sources.add(source);
+    if (!sources.has(source as string)) {
+      sources.add(source as string);
     }
 
     const representative = alias ? alias : name;
-    const defId = `${parentId}:${representative}`;
 
     if (representative) {
       // defines
+      const defId = createCanonicalId(parentId, representative as string);
       edges.push({
         from: parentId,
         to: defId,
@@ -44,7 +46,7 @@ function convertImports(
     // import relationship
     edges.push({
       from: parentId,
-      to: source,
+      to: source as string,
       kind: "imports",
       resolved: true,
       props: type

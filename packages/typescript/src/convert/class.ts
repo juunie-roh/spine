@@ -1,9 +1,9 @@
-import type { Capture, Edge, Node } from "@/models";
+import type { Capture, CaptureResult, Edge, Node } from "@/models";
 
 import { convert } from "./convert";
 
 function convertClassBody(
-  body: Capture.ClassBody,
+  body: { methods: Capture<"method">[]; members: Capture<"member">[] },
   parentId: string,
 ): { edges: Edge[]; nodes: Node[] } {
   const edges: Edge[] = [];
@@ -37,35 +37,34 @@ function convertClassBody(
     } satisfies Node);
 
     if (method.body) {
-      const nested = convert(method.body, method.id);
+      const nested = convert(method.body as CaptureResult, method.id);
       edges.push(...nested.edges);
       nodes.push(...nested.nodes);
     }
   }
 
-  for (const field of body.fields) {
+  for (const member of body.members) {
     edges.push({
       from: parentId,
-      to: field.id,
+      to: member.id,
       kind: "defines",
       resolved: true,
     } satisfies Edge);
 
     nodes.push({
-      id: field.id,
-      kind: "field",
+      id: member.id,
+      kind: "member",
       range: {
-        startIndex: field.node.startIndex,
-        endIndex: field.node.endIndex,
-        startPosition: field.node.startPosition,
-        endPosition: field.node.endPosition,
+        startIndex: member.node.startIndex,
+        endIndex: member.node.endIndex,
+        startPosition: member.node.startPosition,
+        endPosition: member.node.endPosition,
       },
       props: {
-        name: field.name,
-        modifier: field.modifier,
-        is_static: field.is_static,
-        type: field.type,
-        value: field.value,
+        name: member.name,
+        modifier: member.modifier,
+        is_static: member.is_static,
+        type: member.type,
       },
     } satisfies Node);
   }
@@ -74,7 +73,7 @@ function convertClassBody(
 }
 
 function convertClasses(
-  classes: Capture.Class[],
+  classes: Capture<"class">[],
   parentId: string,
 ): {
   edges: Edge[];
@@ -110,7 +109,13 @@ function convertClasses(
       } satisfies Node);
 
       if (cls.body) {
-        const nested = convertClassBody(cls.body, cls.id);
+        const nested = convertClassBody(
+          cls.body as {
+            methods: Capture<"method">[];
+            members: Capture<"member">[];
+          },
+          cls.id,
+        );
         edges.push(...nested.edges);
         nodes.push(...nested.nodes);
       }

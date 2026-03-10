@@ -1,9 +1,9 @@
-import type { Capture, Edge, Node } from "@/models";
+import type { Capture, CaptureResult, Edge, Node } from "@/models";
 
 import { convert } from "./convert";
 
 function convertFunctions(
-  functions: Capture.Function[],
+  functions: Capture<"function">[],
   parentId: string,
 ): {
   edges: Edge[];
@@ -40,7 +40,7 @@ function convertFunctions(
     } satisfies Node);
 
     if (func.body) {
-      const nested = convert(func.body, func.id);
+      const nested = convert(func.body as CaptureResult, func.id);
       edges.push(...nested.edges);
       nodes.push(...nested.nodes);
     }
