@@ -1,5 +1,5 @@
 {
-  "name": "@juun-roh/symbex-typescript",
+  "name": "@symbex/typescript",
   "version": "0.0.0",
   "description": "TypeScript plugin for symbex",
   "main": "dist/index.js",
