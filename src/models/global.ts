@@ -1,11 +1,15 @@
 import type TSParser from "tree-sitter";
 
+/**
+ * @template K - String union of valid `kind` values for this node. Defaults to
+ * `string` for untyped use; narrow it to a literal union to get type-safe `kind` access.
+ * @example
+ * import type * as semdex from "semdex";
+ * type Node = semdex.Node<"node kind" | "string literals">;
+ */
 interface Node<K extends string = string> {
   /**
    * Unique human-readable id identifying the node.
-   *
-   * Uses a colon `:` as a depth separator.
-   * @example "src/models/base.ts:Node"
    */
   id: string;
   /**
@@ -24,7 +28,11 @@ interface Node<K extends string = string> {
 }
 
 /**
- * Identified by a composite key (from + to + kind).
+ * @template K - String union of valid `kind` values for this edge. Defaults to
+ * `string` for untyped use; narrow it to a literal union to get type-safe `kind` access.
+ * @example
+ * import type * as semdex from "semdex";
+ * type Edge = semdex.Edge<"edge kind" | "string literals">;
  */
 interface Edge<K extends string = string> {
   /**
@@ -49,4 +57,11 @@ interface Edge<K extends string = string> {
   props?: Record<string, unknown>;
 }
 
-export type { Edge, Node };
+type QueryTag = {
+  required: string;
+  optional: string;
+};
+
+type Query = Record<string, QueryTag>;
+
+export type { Edge, Node, Query, QueryTag };
