@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>semdex Graph Visualizer</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      background: #0d1117;
+      color: #e6edf3;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top Bar ─────────────────────────────────────────────────── */
+    #topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    #topbar h1 { font-size: 14px; font-weight: 600; color: #58a6ff; letter-spacing: 0.5px; }
+
+    label { font-size: 12px; color: #8b949e; }
+
+    input[type="file"] {
+      font-size: 12px;
+      color: #e6edf3;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    input[type="file"]:hover { border-color: #58a6ff; }
+
+    #paste-btn, #sample-btn {
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+      cursor: pointer;
+      background: #21262d;
+      color: #e6edf3;
+      transition: border-color 0.15s;
+    }
+    #paste-btn:hover, #sample-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+
+    #node-count { font-size: 11px; color: #8b949e; margin-left: auto; }
+
+    /* ── Controls ────────────────────────────────────────────────── */
+    #controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 6px 16px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .ctrl-group { display: flex; align-items: center; gap: 6px; }
+    .ctrl-group label { font-size: 11px; color: #8b949e; white-space: nowrap; }
+
+    input[type="range"] {
+      width: 90px;
+      accent-color: #58a6ff;
+    }
+
+    input[type="checkbox"] { accent-color: #58a6ff; cursor: pointer; }
+
+    /* ── Multi-select dropdown ───────────────────────────────────── */
+    .multi-select { position: relative; }
+
+    .ms-trigger {
+      font-size: 11px;
+      font-family: inherit;
+      padding: 4px 8px;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+      color: #e6edf3;
+      cursor: pointer;
+      white-space: nowrap;
+      min-width: 100px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: border-color 0.15s;
+    }
+    .ms-trigger:hover, .ms-trigger.open { border-color: #58a6ff; }
+    .ms-trigger .ms-arrow { margin-left: auto; color: #8b949e; font-size: 9px; }
+
+    .ms-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 170px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 4px 0;
+      z-index: 200;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .ms-dropdown.open { display: block; }
+
+    .ms-all-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      font-size: 11px;
+      color: #8b949e;
+      cursor: pointer;
+      user-select: none;
+    }
+    .ms-all-row:hover { background: #21262d; color: #e6edf3; }
+
+    .ms-divider { border: none; border-top: 1px solid #30363d; margin: 3px 0; }
+
+    .ms-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 11px;
+      color: #e6edf3;
+      user-select: none;
+    }
+    .ms-item:hover { background: #21262d; }
+    .ms-item input[type="checkbox"] { flex-shrink: 0; }
+
+    .ms-swatch {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .ms-swatch.edge {
+      border-radius: 2px;
+      height: 3px;
+      width: 14px;
+    }
+
+    /* ── Main Canvas ─────────────────────────────────────────────── */
+    #canvas-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    svg#graph {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* ── Legend ──────────────────────────────────────────────────── */
+    #legend {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(22, 27, 34, 0.92);
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 11px;
+      max-width: 220px;
+      backdrop-filter: blur(4px);
+    }
+
+    #legend h3 { font-size: 11px; color: #8b949e; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .legend-section { margin-bottom: 10px; }
+    .legend-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .legend-line {
+      width: 20px; height: 2px; flex-shrink: 0; position: relative;
+      display: flex; align-items: center;
+    }
+    .legend-line::after {
+      content: '›';
+      position: absolute;
+      right: -2px;
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    /* ── Tooltip ─────────────────────────────────────────────────── */
+    #tooltip {
+      position: absolute;
+      visibility: hidden;
+      background: rgba(22, 27, 34, 0.96);
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 11px;
+      max-width: 340px;
+      pointer-events: none;
+      z-index: 100;
+      word-break: break-all;
+    }
+
+    #tooltip .tt-id { color: #58a6ff; font-weight: 600; margin-bottom: 4px; }
+    #tooltip .tt-kind { color: #d2a8ff; margin-bottom: 2px; }
+    #tooltip .tt-range { color: #8b949e; }
+
+    /* ── Nodes & Links ───────────────────────────────────────────── */
+    .node circle {
+      stroke-width: 1.5px;
+      transition: r 0.15s;
+      cursor: pointer;
+    }
+    .node circle:hover { stroke-width: 3px; }
+    .node.selected circle { stroke-width: 3px; filter: drop-shadow(0 0 6px currentColor); }
+
+    .node text {
+      fill: #e6edf3;
+      font-size: 10px;
+      pointer-events: none;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    .link {
+      fill: none;
+      stroke-opacity: 0.55;
+      stroke-width: 1.2px;
+    }
+    .link.highlighted { stroke-opacity: 1; stroke-width: 2px; }
+
+    .link-label {
+      font-size: 9px;
+      fill: #8b949e;
+      pointer-events: none;
+    }
+
+    /* ── Hulls ───────────────────────────────────────────────────────── */
+    .hull {
+      stroke-width: 1.5px;
+      fill-opacity: 0.07;
+      stroke-opacity: 0.3;
+    }
+    .hull-label {
+      font-size: 9px;
+      fill: #8b949e;
+      pointer-events: none;
+      text-anchor: middle;
+    }
+
+    /* ── Info Panel ──────────────────────────────────────────────── */
+    #info-panel {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(22, 27, 34, 0.92);
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 11px;
+      max-width: 360px;
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+
+    #info-panel h3 { color: #58a6ff; margin-bottom: 6px; font-size: 12px; word-break: break-all; }
+    #info-panel .info-kind { color: #d2a8ff; margin-bottom: 8px; }
+    #info-panel .info-section { margin-top: 8px; }
+    #info-panel .info-section h4 { color: #8b949e; font-size: 10px; text-transform: uppercase; margin-bottom: 4px; }
+    #info-panel .info-edge { color: #3fb950; margin: 2px 0; font-size: 10px; word-break: break-all; }
+    #info-panel .info-edge.incoming { color: #f78166; }
+    #info-panel .close-btn {
+      position: absolute; top: 8px; right: 8px;
+      cursor: pointer; color: #8b949e; font-size: 14px; line-height: 1;
+    }
+    #info-panel .close-btn:hover { color: #e6edf3; }
+
+    /* ── Empty State ─────────────────────────────────────────────── */
+    #empty-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: #8b949e;
+      pointer-events: none;
+    }
+    #empty-state.hidden { display: none; }
+    #empty-state p { font-size: 13px; }
+    #empty-state code {
+      background: #21262d;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #e6edf3;
+      pointer-events: all;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div id="topbar">
+  <h1>semdex Graph Visualizer</h1>
+  <label for="file-input">Load JSON</label>
+  <input type="file" id="file-input" accept=".json,application/json" />
+  <button id="paste-btn">Paste JSON</button>
+  <button id="sample-btn">Load Sample</button>
+  <span id="node-count"></span>
+</div>
+
+<!-- Controls -->
+<div id="controls">
+  <div class="ctrl-group">
+    <label>Link force</label>
+    <input type="range" id="link-dist" min="30" max="300" value="100" />
+  </div>
+  <div class="ctrl-group">
+    <label>Charge</label>
+    <input type="range" id="charge" min="-800" max="-20" value="-220" />
+  </div>
+  <div class="ctrl-group">
+    <label>Show labels</label>
+    <input type="checkbox" id="show-labels" checked />
+  </div>
+  <div class="ctrl-group">
+    <label>Show edge labels</label>
+    <input type="checkbox" id="show-edge-labels" />
+  </div>
+  <div class="ctrl-group">
+    <label>Group by file</label>
+    <input type="checkbox" id="show-hulls" checked />
+  </div>
+  <div class="ctrl-group">
+    <label>Node kinds</label>
+    <div class="multi-select" id="kind-ms">
+      <button class="ms-trigger" id="kind-ms-btn">
+        <span class="ms-label">All kinds</span>
+        <span class="ms-arrow">▾</span>
+      </button>
+    </div>
+  </div>
+  <div class="ctrl-group">
+    <label>Edge kinds</label>
+    <div class="multi-select" id="edge-ms">
+      <button class="ms-trigger" id="edge-ms-btn">
+        <span class="ms-label">All edges</span>
+        <span class="ms-arrow">▾</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Canvas -->
+<div id="canvas-wrap">
+  <svg id="graph">
+    <defs>
+      <!-- Arrow markers per edge kind; created dynamically -->
+    </defs>
+  </svg>
+
+  <div id="empty-state">
+    <p>Load a semdex graph to visualize it.</p>
+    <code>const data = graph.serialize();<br>// paste or save data as JSON and load above</code>
+  </div>
+
+  <div id="legend">
+    <div class="legend-section" id="node-legend">
+      <h3>Node kinds</h3>
+    </div>
+    <div class="legend-section" id="edge-legend">
+      <h3>Edge kinds</h3>
+    </div>
+  </div>
+
+  <div id="info-panel">
+    <span class="close-btn" id="close-info">✕</span>
+    <h3 id="info-id"></h3>
+    <div class="info-kind" id="info-kind"></div>
+    <div class="info-section" id="info-outgoing">
+      <h4>Outgoing edges</h4>
+      <div id="info-out-list"></div>
+    </div>
+    <div class="info-section" id="info-incoming">
+      <h4>Incoming edges</h4>
+      <div id="info-in-list"></div>
+    </div>
+  </div>
+
+  <div id="tooltip">
+    <div class="tt-id" id="tt-id"></div>
+    <div class="tt-kind" id="tt-kind"></div>
+    <div class="tt-range" id="tt-range"></div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// Palette
+// ─────────────────────────────────────────────────────────────────────────────
+const NODE_COLORS = {
+  file:           '#58a6ff',
+  module:         '#388bfd',
+  class:          '#d2a8ff',
+  abstract_class: '#bc8cff',
+  function:       '#3fb950',
+  method:         '#56d364',
+  abstract_method:'#2ea043',
+  variable:       '#e3b341',
+  member:         '#f0883e',
+  import:         '#8b949e',
+  type:           '#ff7b72',
+  params:         '#ffa657',
+};
+const DEFAULT_NODE_COLOR = '#6e7681';
+
+const EDGE_COLORS = {
+  defines:      '#58a6ff',
+  imports:      '#8b949e',
+  extends:      '#d2a8ff',
+  implements:   '#3fb950',
+  constraints:  '#f78166',
+};
+const DEFAULT_EDGE_COLOR = '#6e7681';
+
+function nodeColor(kind) { return NODE_COLORS[kind] ?? DEFAULT_NODE_COLOR; }
+function edgeColor(kind) { return EDGE_COLORS[kind] ?? DEFAULT_EDGE_COLOR; }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────────────────────────────────────
+let simulation = null;
+let currentData = null;
+let selectedNode = null;
+// null = all selected; Set = explicit selection
+let selectedNodeKinds = null;
+let selectedEdgeKinds = null;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SVG setup
+// ─────────────────────────────────────────────────────────────────────────────
+const svg = d3.select('#graph');
+const defs = svg.select('defs');
+let gRoot = svg.append('g').attr('id', 'root');
+
+const zoom = d3.zoom()
+  .scaleExtent([0.05, 8])
+  .on('zoom', e => gRoot.attr('transform', e.transform));
+
+svg.call(zoom);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sample data
+// ─────────────────────────────────────────────────────────────────────────────
+const SAMPLE_DATA = {
+  nodes: [
+    { id: 'src/core/parser.ts', kind: 'file' },
+    { id: 'src/core/parser.ts::class::Parser', kind: 'class' },
+    { id: 'src/core/parser.ts::class::Parser::method::parse', kind: 'method' },
+    { id: 'src/core/language.ts', kind: 'file' },
+    { id: 'src/core/language.ts::class::Language', kind: 'class' },
+    { id: 'src/core/language.ts::class::Language::method::extract', kind: 'method' },
+    { id: 'src/core/language.ts::class::Language::method::parse', kind: 'method' },
+    { id: 'src/core/graph/graph.ts', kind: 'file' },
+    { id: 'src/core/graph/graph.ts::class::Graph', kind: 'class' },
+    { id: 'src/core/graph/graph.ts::class::Graph::method::addNode', kind: 'method' },
+    { id: 'src/core/graph/graph.ts::class::Graph::method::addEdge', kind: 'method' },
+    { id: 'src/core/graph/graph.ts::class::Graph::method::serialize', kind: 'method' },
+    { id: 'src/models/global.ts', kind: 'file' },
+    { id: 'src/models/global.ts::type::Node', kind: 'type' },
+    { id: 'src/models/global.ts::type::Edge', kind: 'type' },
+    { id: 'src/utils/factory.ts', kind: 'file' },
+    { id: 'src/utils/factory.ts::function::createCapture', kind: 'function' },
+    { id: 'packages/typescript/src/capture.ts', kind: 'file' },
+    { id: 'packages/typescript/src/capture.ts::variable::capture', kind: 'variable' },
+    { id: 'packages/typescript/src/convert/convert.ts', kind: 'file' },
+    { id: 'packages/typescript/src/convert/convert.ts::function::convert', kind: 'function' },
+    { id: 'tree-sitter', kind: 'module' },
+    { id: 'semdex', kind: 'module' },
+  ],
+  edges: [
+    { from: 'src/core/parser.ts', to: 'src/core/parser.ts::class::Parser', kind: 'defines', resolved: true },
+    { from: 'src/core/parser.ts::class::Parser', to: 'src/core/parser.ts::class::Parser::method::parse', kind: 'defines', resolved: true },
+    { from: 'src/core/language.ts', to: 'src/core/language.ts::class::Language', kind: 'defines', resolved: true },
+    { from: 'src/core/language.ts::class::Language', to: 'src/core/language.ts::class::Language::method::extract', kind: 'defines', resolved: true },
+    { from: 'src/core/language.ts::class::Language', to: 'src/core/language.ts::class::Language::method::parse', kind: 'defines', resolved: true },
+    { from: 'src/core/graph/graph.ts', to: 'src/core/graph/graph.ts::class::Graph', kind: 'defines', resolved: true },
+    { from: 'src/core/graph/graph.ts::class::Graph', to: 'src/core/graph/graph.ts::class::Graph::method::addNode', kind: 'defines', resolved: true },
+    { from: 'src/core/graph/graph.ts::class::Graph', to: 'src/core/graph/graph.ts::class::Graph::method::addEdge', kind: 'defines', resolved: true },
+    { from: 'src/core/graph/graph.ts::class::Graph', to: 'src/core/graph/graph.ts::class::Graph::method::serialize', kind: 'defines', resolved: true },
+    { from: 'src/models/global.ts', to: 'src/models/global.ts::type::Node', kind: 'defines', resolved: true },
+    { from: 'src/models/global.ts', to: 'src/models/global.ts::type::Edge', kind: 'defines', resolved: true },
+    { from: 'src/utils/factory.ts', to: 'src/utils/factory.ts::function::createCapture', kind: 'defines', resolved: true },
+    { from: 'packages/typescript/src/capture.ts', to: 'packages/typescript/src/capture.ts::variable::capture', kind: 'defines', resolved: true },
+    { from: 'packages/typescript/src/convert/convert.ts', to: 'packages/typescript/src/convert/convert.ts::function::convert', kind: 'defines', resolved: true },
+    { from: 'src/core/parser.ts', to: 'src/core/language.ts::class::Language', kind: 'imports', resolved: true },
+    { from: 'src/core/parser.ts', to: 'src/models/global.ts::type::Node', kind: 'imports', resolved: true },
+    { from: 'src/core/parser.ts', to: 'src/models/global.ts::type::Edge', kind: 'imports', resolved: true },
+    { from: 'src/core/language.ts', to: 'src/models/global.ts::type::Node', kind: 'imports', resolved: true },
+    { from: 'src/core/language.ts', to: 'src/models/global.ts::type::Edge', kind: 'imports', resolved: true },
+    { from: 'src/core/graph/graph.ts', to: 'src/models/global.ts::type::Node', kind: 'imports', resolved: true },
+    { from: 'src/core/graph/graph.ts', to: 'src/models/global.ts::type::Edge', kind: 'imports', resolved: true },
+    { from: 'packages/typescript/src/capture.ts', to: 'src/utils/factory.ts::function::createCapture', kind: 'imports', resolved: true },
+    { from: 'src/core/parser.ts', to: 'tree-sitter', kind: 'imports', resolved: true },
+    { from: 'src/core/language.ts', to: 'tree-sitter', kind: 'imports', resolved: true },
+    { from: 'packages/typescript/src/convert/convert.ts', to: 'semdex', kind: 'imports', resolved: true },
+  ]
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+function shortLabel(id) {
+  const parts = id.split('::');
+  return parts[parts.length - 1];
+}
+
+function nodeRadius(kind) {
+  const radii = {
+    module: 14, file: 12, class: 11, abstract_class: 11,
+    function: 9, method: 8, abstract_method: 8,
+    variable: 7, member: 7, import: 6, type: 8, params: 6,
+  };
+  return radii[kind] ?? 8;
+}
+
+// Returns the top-level file/module segment of a node ID.
+function nodeFile(id) { return id.split('::')[0]; }
+
+// Hull geometry ──────────────────────────────────────────────────────────────
+const HULL_PAD = 22;
+const hullLine = d3.line().curve(d3.curveCatmullRomClosed.alpha(0.5));
+
+/**
+ * Computes a padded convex-hull path string for the given point array.
+ * Works for 1, 2, or N points by expanding each point into a ring of samples
+ * before computing the hull — this naturally produces circles and capsules for
+ * small groups without any special-casing.
+ */
+function computeHullPath(pts) {
+  if (!pts || pts.length === 0) return null;
+  const expanded = [];
+  for (const [x, y] of pts) {
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * 2 * Math.PI;
+      expanded.push([x + Math.cos(a) * HULL_PAD, y + Math.sin(a) * HULL_PAD]);
+    }
+  }
+  const hull = d3.polygonHull(expanded);
+  return hull ? hullLine(hull) : null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Multi-select component
+// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Builds (or rebuilds) a checkbox dropdown inside `containerId`.
+ * @param {string} containerId  – id of .multi-select wrapper
+ * @param {string} btnId        – id of .ms-trigger button
+ * @param {string[]} values     – list of option values
+ * @param {(v:string)=>string} colorFn – color getter for the swatch
+ * @param {boolean} isEdge      – true = edge filter (rectangular swatch)
+ * @param {()=>void} onChange   – called whenever the selection changes
+ */
+function _buildMultiSelect(containerId, btnId, values, colorFn, isEdge, onChange) {
+  const container = document.getElementById(containerId);
+  const btn       = document.getElementById(btnId);
+  const label     = btn.querySelector('.ms-label');
+
+  // Remove existing dropdown (rebuild on new dataset)
+  const old = container.querySelector('.ms-dropdown');
+  if (old) old.remove();
+
+  const drop = document.createElement('div');
+  drop.className = 'ms-dropdown';
+  container.appendChild(drop);
+
+  // ── helpers ──────────────────────────────────────────────────────
+  const getSelected = () => isEdge ? selectedEdgeKinds : selectedNodeKinds;
+  const setSelected = v  => { if (isEdge) selectedEdgeKinds = v; else selectedNodeKinds = v; };
+
+  function updateLabel() {
+    const sel = getSelected();
+    if (sel === null || sel.size === values.length) {
+      label.textContent = isEdge ? 'All edges' : 'All kinds';
+    } else if (sel.size === 0) {
+      label.textContent = 'None';
+    } else {
+      label.textContent = `${sel.size} / ${values.length}`;
+    }
+  }
+
+  function syncCheckboxes() {
+    const sel = getSelected();
+    drop.querySelectorAll('.ms-item input').forEach(cb => {
+      cb.checked = sel === null || sel.has(cb.value);
+    });
+    const allCb = drop.querySelector('.ms-all-cb');
+    if (allCb) {
+      const all = sel === null || sel.size === values.length;
+      const none = sel !== null && sel.size === 0;
+      allCb.checked = all;
+      allCb.indeterminate = !all && !none;
+    }
+  }
+
+  // ── "All" row ─────────────────────────────────────────────────────
+  const allRow = document.createElement('div');
+  allRow.className = 'ms-all-row';
+  const allCb = document.createElement('input');
+  allCb.type = 'checkbox';
+  allCb.className = 'ms-all-cb';
+  allCb.checked = true;
+  const allSpan = document.createElement('span');
+  allSpan.textContent = 'All';
+  allRow.appendChild(allCb);
+  allRow.appendChild(allSpan);
+  allRow.addEventListener('click', e => {
+    if (e.target !== allCb) allCb.checked = !allCb.checked;
+    setSelected(allCb.checked ? null : new Set());
+    syncCheckboxes();
+    updateLabel();
+    onChange();
+  });
+  drop.appendChild(allRow);
+
+  const divider = document.createElement('hr');
+  divider.className = 'ms-divider';
+  drop.appendChild(divider);
+
+  // ── Item rows ─────────────────────────────────────────────────────
+  values.forEach(v => {
+    const item = document.createElement('div');
+    item.className = 'ms-item';
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = v;
+    cb.checked = true;
+
+    const swatch = document.createElement('div');
+    swatch.className = isEdge ? 'ms-swatch edge' : 'ms-swatch';
+    swatch.style.background = colorFn(v);
+
+    const span = document.createElement('span');
+    span.textContent = v;
+
+    item.appendChild(cb);
+    item.appendChild(swatch);
+    item.appendChild(span);
+
+    item.addEventListener('click', e => {
+      if (e.target !== cb) cb.checked = !cb.checked;
+
+      // Materialise "all" into an explicit set before mutating
+      let sel = getSelected();
+      if (sel === null) sel = new Set(values);
+
+      if (cb.checked) sel.add(v); else sel.delete(v);
+      // Collapse back to null when everything is checked
+      setSelected(sel.size === values.length ? null : sel);
+
+      syncCheckboxes();
+      updateLabel();
+      onChange();
+    });
+
+    drop.appendChild(item);
+  });
+
+  // ── Open / close toggle ───────────────────────────────────────────
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const opening = !drop.classList.contains('open');
+    // Close all open dropdowns first
+    document.querySelectorAll('.ms-dropdown.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.ms-trigger.open').forEach(b => b.classList.remove('open'));
+    if (opening) {
+      drop.classList.add('open');
+      btn.classList.add('open');
+    }
+  });
+
+  // Prevent clicks inside the dropdown from bubbling to the global close handler
+  drop.addEventListener('click', e => e.stopPropagation());
+
+  updateLabel();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Render
+// ─────────────────────────────────────────────────────────────────────────────
+function render(rawData) {
+  currentData = rawData;
+
+  // Filter nodes / edges using global selection state
+  const nodes = rawData.nodes.filter(n =>
+    selectedNodeKinds === null || selectedNodeKinds.has(n.kind)
+  );
+  const nodeIds = new Set(nodes.map(n => n.id));
+  const edges = rawData.edges.filter(e =>
+    nodeIds.has(e.from) && nodeIds.has(e.to) &&
+    (selectedEdgeKinds === null || selectedEdgeKinds.has(e.kind))
+  );
+
+  // Update stats
+  document.getElementById('node-count').textContent =
+    `${nodes.length} nodes · ${edges.length} edges`;
+
+  // Hide empty state
+  document.getElementById('empty-state').classList.add('hidden');
+
+  // Stop old simulation
+  if (simulation) simulation.stop();
+  gRoot.selectAll('*').remove();
+
+  // Arrow markers for every active edge kind
+  defs.selectAll('marker').remove();
+  const activeEdgeKinds = [...new Set(edges.map(e => e.kind))];
+  activeEdgeKinds.forEach(kind => {
+    defs.append('marker')
+      .attr('id', `arrow-${kind}`)
+      .attr('viewBox', '0 -5 10 10')
+      .attr('refX', 22)
+      .attr('refY', 0)
+      .attr('markerWidth', 6)
+      .attr('markerHeight', 6)
+      .attr('orient', 'auto')
+      .append('path')
+        .attr('d', 'M0,-5L10,0L0,5')
+        .attr('fill', edgeColor(kind));
+  });
+
+  // Index incoming edges for info panel
+  const incomingMap = new Map();
+  edges.forEach(e => {
+    if (!incomingMap.has(e.to)) incomingMap.set(e.to, []);
+    incomingMap.get(e.to).push(e);
+  });
+
+  // D3 force simulation data (mutable copies)
+  const simNodes = nodes.map(n => ({ ...n }));
+  const idIndex  = new Map(simNodes.map(n => [n.id, n]));
+  const simLinks = edges
+    .map(e => ({ ...e, source: idIndex.get(e.from), target: idIndex.get(e.to) }))
+    .filter(e => e.source && e.target);
+
+  const linkDist = +document.getElementById('link-dist').value;
+  const charge   = +document.getElementById('charge').value;
+  const { width, height } = document.getElementById('canvas-wrap').getBoundingClientRect();
+
+  simulation = d3.forceSimulation(simNodes)
+    .force('link', d3.forceLink(simLinks).id(d => d.id).distance(linkDist))
+    .force('charge', d3.forceManyBody().strength(charge))
+    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('collide', d3.forceCollide(d => nodeRadius(d.kind) + 4));
+
+  // ── Links ────────────────────────────────────────────────────────
+  const link = gRoot.append('g').attr('id', 'links')
+    .selectAll('.link')
+    .data(simLinks)
+    .join('line')
+      .attr('class', 'link')
+      .attr('stroke', d => edgeColor(d.kind))
+      .attr('marker-end', d => `url(#arrow-${d.kind})`);
+
+  // Edge labels
+  const showEdgeLabels = document.getElementById('show-edge-labels').checked;
+  const edgeLabel = gRoot.append('g').attr('id', 'edge-labels')
+    .selectAll('.link-label')
+    .data(simLinks)
+    .join('text')
+      .attr('class', 'link-label')
+      .style('display', showEdgeLabels ? null : 'none')
+      .text(d => d.kind);
+
+  // ── Nodes ────────────────────────────────────────────────────────
+  const node = gRoot.append('g').attr('id', 'nodes')
+    .selectAll('.node')
+    .data(simNodes)
+    .join('g')
+      .attr('class', 'node')
+      .call(d3.drag()
+        .on('start', (event, d) => {
+          if (!event.active) simulation.alphaTarget(0.3).restart();
+          d.fx = d.x; d.fy = d.y;
+        })
+        .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
+        .on('end', (event, d) => {
+          if (!event.active) simulation.alphaTarget(0);
+          d.fx = null; d.fy = null;
+        })
+      );
+
+  node.append('circle')
+    .attr('r', d => nodeRadius(d.kind))
+    .attr('fill', d => nodeColor(d.kind))
+    .attr('stroke', d => d3.color(nodeColor(d.kind)).darker(1));
+
+  const showLabels = document.getElementById('show-labels').checked;
+  node.append('text')
+    .style('display', showLabels ? null : 'none')
+    .attr('dy', d => nodeRadius(d.kind) + 10)
+    .text(d => shortLabel(d.id));
+
+  // ── Interactions ─────────────────────────────────────────────────
+  const tooltip = document.getElementById('tooltip');
+  const ttId    = document.getElementById('tt-id');
+  const ttKind  = document.getElementById('tt-kind');
+  const ttRange = document.getElementById('tt-range');
+
+  node
+    .on('mouseover', (event, d) => {
+      ttId.textContent   = d.id;
+      ttKind.textContent = `kind: ${d.kind}`;
+      ttRange.textContent = d.range
+        ? `lines ${d.range.startPosition?.row ?? '?'}–${d.range.endPosition?.row ?? '?'}`
+        : '';
+      tooltip.style.visibility = 'visible';
+    })
+    .on('mousemove', event => {
+      tooltip.style.top  = (event.clientY - 12) + 'px';
+      tooltip.style.left = (event.clientX + 14) + 'px';
+    })
+    .on('mouseout', () => { tooltip.style.visibility = 'hidden'; })
+    .on('click', (event, d) => {
+      event.stopPropagation();
+      _showInfoPanel(d, simLinks, incomingMap);
+      link.classed('highlighted', e => e.source.id === d.id || e.target.id === d.id);
+      node.classed('selected', n => n.id === d.id);
+      selectedNode = d;
+    });
+
+  svg.on('click', () => {
+    _hideInfoPanel();
+    link.classed('highlighted', false);
+    node.classed('selected', false);
+    selectedNode = null;
+  });
+
+  // ── Tick ─────────────────────────────────────────────────────────
+  simulation.on('tick', () => {
+    link
+      .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    edgeLabel
+      .attr('x', d => (d.source.x + d.target.x) / 2)
+      .attr('y', d => (d.source.y + d.target.y) / 2);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+
+  simulation.on('end', () => zoomToFit());
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UI helpers
+// ─────────────────────────────────────────────────────────────────────────────
+function _buildLegend(nodeKinds, edgeKinds) {
+  const nl = document.getElementById('node-legend');
+  nl.innerHTML = '<h3>Node kinds</h3>';
+  nodeKinds.forEach(k => {
+    nl.insertAdjacentHTML('beforeend', `
+      <div class="legend-row">
+        <div class="legend-dot" style="background:${nodeColor(k)}"></div>
+        <span>${k}</span>
+      </div>`);
+  });
+
+  const el = document.getElementById('edge-legend');
+  el.innerHTML = '<h3>Edge kinds</h3>';
+  edgeKinds.forEach(k => {
+    el.insertAdjacentHTML('beforeend', `
+      <div class="legend-row">
+        <div class="legend-line" style="background:${edgeColor(k)};color:${edgeColor(k)}"></div>
+        <span>${k}</span>
+      </div>`);
+  });
+}
+
+function _showInfoPanel(d, simLinks, incomingMap) {
+  document.getElementById('info-id').textContent   = d.id;
+  document.getElementById('info-kind').textContent = `kind: ${d.kind}`;
+
+  const outList = document.getElementById('info-out-list');
+  outList.innerHTML = '';
+  simLinks.filter(e => e.source.id === d.id).forEach(e => {
+    outList.insertAdjacentHTML('beforeend',
+      `<div class="info-edge">${e.kind} → ${e.target.id}</div>`);
+  });
+
+  const inList = document.getElementById('info-in-list');
+  inList.innerHTML = '';
+  (incomingMap.get(d.id) ?? []).forEach(e => {
+    inList.insertAdjacentHTML('beforeend',
+      `<div class="info-edge incoming">${e.kind} ← ${e.from}</div>`);
+  });
+
+  document.getElementById('info-panel').style.display = 'block';
+}
+
+function _hideInfoPanel() {
+  document.getElementById('info-panel').style.display = 'none';
+}
+
+function zoomToFit() {
+  const wrap = document.getElementById('canvas-wrap');
+  const { width, height } = wrap.getBoundingClientRect();
+  const bounds = gRoot.node().getBBox();
+  if (!bounds.width || !bounds.height) return;
+  const scale = 0.85 * Math.min(width / bounds.width, height / bounds.height);
+  const tx = (width  - scale * bounds.width)  / 2 - scale * bounds.x;
+  const ty = (height - scale * bounds.height) / 2 - scale * bounds.y;
+  svg.transition().duration(600).call(
+    zoom.transform,
+    d3.zoomIdentity.translate(tx, ty).scale(scale)
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Load JSON data
+// ─────────────────────────────────────────────────────────────────────────────
+function loadData(json) {
+  let data;
+  try {
+    data = typeof json === 'string' ? JSON.parse(json) : json;
+  } catch {
+    alert('Invalid JSON');
+    return;
+  }
+  if (!Array.isArray(data.nodes) || !Array.isArray(data.edges)) {
+    alert('Expected { nodes: [...], edges: [...] } — the output of graph.serialize()');
+    return;
+  }
+
+  // Reset selections
+  selectedNodeKinds = null;
+  selectedEdgeKinds = null;
+
+  const allKinds     = [...new Set(data.nodes.map(n => n.kind))].sort();
+  const allEdgeKinds = [...new Set(data.edges.map(e => e.kind))].sort();
+
+  _buildMultiSelect('kind-ms', 'kind-ms-btn', allKinds,     nodeColor, false, rerender);
+  _buildMultiSelect('edge-ms', 'edge-ms-btn', allEdgeKinds, edgeColor, true,  rerender);
+  _buildLegend(allKinds, allEdgeKinds);
+
+  render(data);
+}
+
+function rerender() {
+  if (currentData) render(currentData);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Event Listeners
+// ─────────────────────────────────────────────────────────────────────────────
+
+// File upload
+document.getElementById('file-input').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => loadData(ev.target.result);
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+// Paste JSON
+document.getElementById('paste-btn').addEventListener('click', async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    loadData(text);
+  } catch {
+    const text = prompt('Paste JSON from graph.serialize():');
+    if (text) loadData(text);
+  }
+});
+
+// Sample
+document.getElementById('sample-btn').addEventListener('click', () => loadData(SAMPLE_DATA));
+
+// Close info panel
+document.getElementById('close-info').addEventListener('click', () => {
+  _hideInfoPanel();
+  if (currentData) {
+    gRoot.selectAll('.link').classed('highlighted', false);
+    gRoot.selectAll('.node').classed('selected', false);
+  }
+});
+
+// Force controls
+document.getElementById('link-dist').addEventListener('input', () => {
+  if (!simulation || !currentData) return;
+  simulation.force('link').distance(+document.getElementById('link-dist').value);
+  simulation.alpha(0.5).restart();
+});
+
+document.getElementById('charge').addEventListener('input', () => {
+  if (!simulation || !currentData) return;
+  simulation.force('charge').strength(+document.getElementById('charge').value);
+  simulation.alpha(0.5).restart();
+});
+
+// Label toggles
+document.getElementById('show-labels').addEventListener('change', e => {
+  gRoot.selectAll('.node text').style('display', e.target.checked ? null : 'none');
+});
+
+document.getElementById('show-edge-labels').addEventListener('change', e => {
+  gRoot.selectAll('.link-label').style('display', e.target.checked ? null : 'none');
+});
+
+// Close all dropdowns on outside click
+document.addEventListener('click', () => {
+  document.querySelectorAll('.ms-dropdown.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.ms-trigger.open').forEach(b => b.classList.remove('open'));
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    _hideInfoPanel();
+    document.querySelectorAll('.ms-dropdown.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.ms-trigger.open').forEach(b => b.classList.remove('open'));
+  }
+  if (e.key === 'f' || e.key === 'F') zoomToFit();
+});
+</script>
+</body>
+</html>
