@@ -1,6 +1,6 @@
 import type * as semdex from "semdex";
 
-type Query = {
+export type Query = {
   abstract_class: {
     required: "node" | "name" | "body";
     optional:
@@ -46,10 +46,10 @@ type Query = {
       | "type_params"
       | "return_type";
   };
-  params: {
-    required: string;
-    optional: string;
-  };
+  // params: {
+  //   required: string;
+  //   optional: string;
+  // };
   // type: {
   //   required: string;
   //   optional: string;
@@ -61,47 +61,35 @@ type Query = {
 };
 
 // TODO: add other declaration kinds
-type NodeKind = keyof Query | "file" | "module" | "type";
+export type NodeKind = keyof Query | "file" | "module" | "type";
 
-type Node = semdex.Node<NodeKind>;
+export type Node = semdex.Node<NodeKind>;
 
 // TODO: add other relationship kinds
-type EdgeKind =
+export type EdgeKind =
   | "constrained"
   | "defines"
   | "extends"
   | "implements"
   | "imports";
-type Edge = semdex.Edge<EdgeKind>;
+export type Edge = semdex.Edge<EdgeKind>;
 
-type Graph = semdex.Graph<Node, Edge>;
+export type Graph = semdex.Graph<Node, Edge>;
 
-type SingleCaptureResult<K extends keyof Query> = semdex.SingleCaptureResult<
-  Query[K]
->;
+export type SingleCaptureResult<K extends keyof Query> =
+  semdex.SingleCaptureResult<Query[K]>;
 
-type FullCaptureResult = semdex.FullCaptureResult<Query>;
+export type FullCaptureResult = semdex.FullCaptureResult<Query>;
 
-type Convert = semdex.Convert<Query, Node, Edge>;
+export type ConvertConfig = semdex.ConvertConfig<Query, Node, Edge>;
 
-type ConvertResult = semdex.ConvertResult<Node, Edge>;
+export type ConvertContext = semdex.ConvertContext<Query, Node, Edge>;
 
-type ConvertHandler<K extends keyof Query> = semdex.ConvertHandler<
+export type ConvertResult = semdex.ConvertResult<Node, Edge>;
+
+export type ConvertHandler<K extends keyof Query> = semdex.ConvertHandler<
+  Query,
   Query[K],
   Node,
   Edge
 >;
-
-export type {
-  Convert,
-  ConvertHandler,
-  ConvertResult,
-  Edge,
-  EdgeKind,
-  FullCaptureResult,
-  Graph,
-  Node,
-  NodeKind,
-  Query,
-  SingleCaptureResult,
-};
