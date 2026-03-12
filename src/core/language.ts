@@ -6,7 +6,7 @@ import { CoreError } from "./error";
 import type { Graph } from "./graph";
 
 /**
- * Represents a loaded and initialized spine language plugin.
+ * Represents a loaded and initialized semdex language plugin.
  */
 class Language {
   private _parser: TSParser;

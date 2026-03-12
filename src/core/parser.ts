@@ -2,8 +2,8 @@ import path from "node:path";
 
 import type TSParser from "tree-sitter";
 
-import { Config } from "@/config";
 import type { Edge, Node } from "@/models";
+import type { Config } from "@/models/config";
 import { defined } from "@/shared/defined";
 
 import { CoreError } from "./error";

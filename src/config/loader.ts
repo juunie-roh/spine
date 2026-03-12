@@ -1,8 +1,9 @@
 import path from "node:path";
 import { cwd } from "node:process";
 
+import type { Config } from "@/models/config";
+
 import { ConfigError } from "./error";
-import { Config } from "./types";
 
 /**
  * Asserts that the given configuration file path is valid.
