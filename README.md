@@ -24,18 +24,21 @@ Structural search also removes invalid states from the generation space: if a fu
 ```text
 tree-sitter AST
     ↓
-[language plugin]       → raw Capture.Result[]  (complete, no opinions)
-    ↓
-[abstraction plugin]    → shaped Node[] + Edge[]  (opinionated view)
+[language plugin]
+        ↓
+    capture()           → raw CaptureResult  (complete, no opinions)
+        ↓
+    convert()           → shaped Node[] + Edge[]  (opinionated view)
     ↓
 [core]                  → builds index, serves queries
 ```
 
-- **Language plugin**: faithfully converts what tree-sitter gives into the common schema. No filtering, no abstraction decisions.
-- **Abstraction plugin**: decides what story to tell from the raw graph. Multiple plugins can produce different views over the same raw data.
+- **Language plugin**:
+  - capture: faithfully converts what tree-sitter gives into the common schema. No filtering, no abstraction decisions.
+  - convert: decides what story to tell from the raw graph. Multiple plugins can produce different views over the same raw data.
 - **Core**: owns the schema, the graph, and the query API. Language-agnostic.
 
-The three-way responsibility: *language plugin → what exists, abstraction plugin → what matters, core → what's queryable.*
+The three-way responsibility: *language plugin capture() → what exists, language plugin convert() → what matters, core → what's queryable.*
 
 ### Data Model
 
@@ -43,11 +46,9 @@ All output is expressed as two types:
 
 ```ts
 interface Node {
-  id: string;       // unique, human-readable, colon-separated scope
-                    // e.g. "src/utils/parse.ts:parseDate"
-                    //      "packages/typescript/__mocks__/all.ts:aliased_named_import_4"
+  id: string;       // unique, human-readable
   kind: string;
-  range?: Range;    // file location pointer
+  range?: Range;    // byte offsets and row/column positions of a node within a file
   props?: Record<string, unknown>;  // language-specific, core carries along but does not touches
 }
 
@@ -60,10 +61,6 @@ interface Edge {
 }
 ```
 
-The schema captures vocabulary developers already use — function, class, import, call, dependency. Language-specific constructs live in `props` and are passed through without interpretation.
-
-Imports are first-class: each imported name (or alias) becomes its own `variable` node. The file gets a `defines` edge to that node, and the node gets an `imports` edge to the source module. This makes import relationships queryable as graph structure rather than file metadata — you can ask which file a binding came from, or which bindings reference a given module.
-
 ### Core
 
 - **`Parser`** — instantiated with a `Config`, maps file extensions to `Language` instances, dispatches `parse(filePath, source)` to the correct plugin.
@@ -74,14 +71,22 @@ Imports are first-class: each imported name (or alias) becomes its own `variable
 
 Each language is a separate workspace package under `packages/<lang>/`. The only currently validated required export is `language` (tree-sitter binding). Plugins are loaded at runtime via `require(packageName)`.
 
-Query strings are split into per-feature `.scm` files and combined using `merge()` from `semdex/utils/query`:
+Query strings are split into per-feature `.scm` files; the core provides query string processor as esbuild plugin.
 
 ```ts
-// packages/typescript/src/query.ts
-const queryString = merge(classQuery, functionQuery, importQuery, ...);
+// packages/typescript/tsup.config.ts
+import { scmPlugin } from "semdex/query";
+import { defineConfig } from "tsup";
+
+export default defineConfig({
+  esbuildPlugins: [scmPlugin], // loads tree-sitter queries written in scm file
+  ... // other options for tsup
+});
 ```
 
 ### Config
+
+Not specified yet.
 
 ```json
 { "language": [{ "ext": ".ts", "name": "@juun-roh/semdex-typescript" }] }
@@ -99,17 +104,14 @@ const queryString = merge(classQuery, functionQuery, importQuery, ...);
 
 ```bash
 # Install
-# for Node 24 or higher, tree-sitter requires c++ or higher to be built
+# for Node 24 or higher, tree-sitter node bindings requires c++ or higher to be built
 CXXFLAGS="-std=c++20" pnpm install
 
 # Build everything
-pnpm build && pnpm -r build
+pnpm build:all
 
 # Run CLI against mock data
 pnpm run:dev
-
-# Run against a project
-node dist/bin/semdex.js -p path/to/semdex.config.json path/to/file.ts
 ```
 
 ## Writing a Language Plugin
