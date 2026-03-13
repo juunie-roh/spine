@@ -1,1 +1,0 @@
-(object_pattern) @object

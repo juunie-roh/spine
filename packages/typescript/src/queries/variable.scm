@@ -8,11 +8,13 @@
   [("const") ("let")] @kind
   (variable_declarator
     name: [
-      (array_pattern (identifier) @name)
       (identifier) @name
-      (object_pattern
-        (pair_pattern key: (_) @key value: (identifier) @name)
-        (shorthand_property_identifier_pattern) @name)
+      (array_pattern) @pattern
+      (object_pattern) @pattern
+      ;; (array_pattern (identifier) @name)
+      ;; (object_pattern
+      ;;   (pair_pattern key: (_) @key value: (identifier) @name)
+      ;;   (shorthand_property_identifier_pattern) @name)
     ]
     type: (type_annotation (type) @type)?)
 ) @node
@@ -22,11 +24,13 @@
   ("var") @kind
   (variable_declarator
     name: [
-      (array_pattern (identifier) @name)
       (identifier) @name
-      (object_pattern
-        (pair_pattern key: (_) @key value: (identifier) @name)
-        (shorthand_property_identifier_pattern) @name)
+      (array_pattern) @pattern
+      (object_pattern) @pattern
+      ;; (array_pattern (identifier) @name)
+      ;; (object_pattern
+      ;;   (pair_pattern key: (_) @key value: (identifier) @name)
+      ;;   (shorthand_property_identifier_pattern) @name)
     ]
     type: (type_annotation (type) @type)?)
 ) @node

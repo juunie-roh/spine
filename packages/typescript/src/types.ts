@@ -46,17 +46,17 @@ export type QueryConfig = {
       | "type_params"
       | "return_type";
   };
-  // params: {
-  //   required: string;
-  //   optional: string;
-  // };
+  pattern: {
+    required: "node";
+    optional: "pattern" | "name" | "default" | "key";
+  };
   // type: {
   //   required: string;
   //   optional: string;
   // };
   variable: {
-    required: "node" | "name" | "kind";
-    optional: "key" | "type";
+    required: "node" | "pattern" | "kind";
+    optional: "name" | "type";
   };
 };
 

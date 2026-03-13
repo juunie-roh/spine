@@ -8,6 +8,7 @@ import functionHandler from "./handlers/function";
 import importHandler from "./handlers/import";
 import memberHandler from "./handlers/member";
 import methodHandler from "./handlers/method";
+import patternHandler from "./handlers/pattern";
 import variableHandler from "./handlers/variable";
 import type { ConvertConfig, Edge, Node, QueryConfig } from "./types";
 
@@ -19,6 +20,7 @@ const config: ConvertConfig = {
   import: importHandler,
   member: memberHandler,
   method: methodHandler,
+  pattern: patternHandler,
   variable: variableHandler,
 };
 

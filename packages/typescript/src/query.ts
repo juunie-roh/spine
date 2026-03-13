@@ -11,6 +11,7 @@ import functionQueryString from "@/queries/function.scm";
 import importQueryString from "@/queries/import.scm";
 import memberQueryString from "@/queries/member.scm";
 import methodQueryString from "@/queries/method.scm";
+import patternQueryString from "@/queries/pattern.scm";
 import variableQueryString from "@/queries/variable.scm";
 
 import type { BypassQueryConfig, QueryConfig } from "./types";
@@ -25,6 +26,7 @@ export const query = new QueryMap<keyof QueryConfig>(language)
   .set("import", importQueryString)
   .set("member", memberQueryString)
   .set("method", methodQueryString)
+  .set("pattern", patternQueryString)
   .set("variable", variableQueryString);
 
 export const bypass = new QueryMap<BypassQueryConfig>(language)
