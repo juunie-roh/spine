@@ -2,7 +2,7 @@ import TSParser from "tree-sitter";
 
 import { QueryError } from "./error";
 
-class QueryMap<K extends string = string> extends Map<K, TSParser.Query> {
+class QueryMap<K extends string> extends Map<K, TSParser.Query> {
   private _language: TSParser.Language;
 
   constructor(language: TSParser.Language) {
@@ -42,22 +42,31 @@ class QueryMap<K extends string = string> extends Map<K, TSParser.Query> {
     key: K,
     node: TSParser.SyntaxNode,
     typesToInclude?: string | string[],
+    maxStartDepth = 1,
   ): TSParser.QueryMatch[] {
-    const { startIndex, endIndex, id } = node;
-    const matches = this.get(key).matches(node, { startIndex, endIndex });
+    const matches = this.get(key).matches(node, {
+      startIndex: node.startIndex,
+      endIndex: node.endIndex,
+      maxStartDepth,
+    });
 
-    const set = new Set(typesToInclude);
+    if (!typesToInclude) return matches;
 
-    const filtered = matches.filter((match) =>
-      match.captures.some(
-        (captured) =>
-          captured.node.parent &&
-          (captured.node.parent.id === id ||
-            set.has(captured.node.parent.type)),
-      ),
+    const set = new Set(
+      Array.isArray(typesToInclude) ? typesToInclude : [typesToInclude],
     );
 
-    return filtered;
+    matches.push(
+      ...node.namedChildren
+        .filter((child) => set.has(child.type))
+        .flatMap((child) => this.match(key, child)),
+    );
+
+    return matches;
+  }
+
+  create(value: string) {
+    return new TSParser.Query(this._language, value);
   }
 }
 
