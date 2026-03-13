@@ -60,6 +60,8 @@ export type QueryConfig = {
   };
 };
 
+export type BypassQueryConfig = "class" | "function";
+
 // TODO: add other declaration kinds
 export type NodeKind = keyof QueryConfig | "file" | "module" | "type";
 

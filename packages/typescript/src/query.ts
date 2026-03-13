@@ -4,6 +4,8 @@ import TypeScript from "tree-sitter-typescript";
 
 import abstractClassQueryString from "@/queries/abstract_class.scm";
 import abstractMethodQueryString from "@/queries/abstract_method.scm";
+import classBypassString from "@/queries/bypass/class.scm";
+import functionBypassString from "@/queries/bypass/function.scm";
 import classQueryString from "@/queries/class.scm";
 import functionQueryString from "@/queries/function.scm";
 import importQueryString from "@/queries/import.scm";
@@ -11,7 +13,7 @@ import memberQueryString from "@/queries/member.scm";
 import methodQueryString from "@/queries/method.scm";
 import variableQueryString from "@/queries/variable.scm";
 
-import type { QueryConfig } from "./types";
+import type { BypassQueryConfig, QueryConfig } from "./types";
 
 export const language = TypeScript.typescript as TSParser.Language;
 
@@ -24,3 +26,7 @@ export const query = new QueryMap<keyof QueryConfig>(language)
   .set("member", memberQueryString)
   .set("method", methodQueryString)
   .set("variable", variableQueryString);
+
+export const bypass = new QueryMap<BypassQueryConfig>(language)
+  .set("class", classBypassString)
+  .set("function", functionBypassString);
