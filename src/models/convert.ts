@@ -1,21 +1,21 @@
 import type { createCapture, createConvert } from "@/utils";
 
 import type { SingleCaptureResult } from "./capture";
-import type { Edge, Node, Query } from "./global";
+import type { Edge, Node, QueryConfig } from "./global";
 
 type ConvertResult<N extends Node, E extends Edge> = {
   nodes: N[];
   edges: E[];
 };
 
-type ConvertContext<Q extends Query, N extends Node, E extends Edge> = {
+type ConvertContext<Q extends QueryConfig, N extends Node, E extends Edge> = {
   capture: ReturnType<typeof createCapture<Q>>;
   convert: ReturnType<typeof createConvert<Q, N, E>>;
 };
 
 type ConvertHandler<
-  Q extends Query,
-  T extends Query[string],
+  Q extends QueryConfig,
+  T extends QueryConfig[string],
   N extends Node,
   E extends Edge,
 > = (
@@ -24,7 +24,7 @@ type ConvertHandler<
   context: ConvertContext<Q, N, E>,
 ) => ConvertResult<N, E>;
 
-type ConvertConfig<Q extends Query, N extends Node, E extends Edge> = {
+type ConvertConfig<Q extends QueryConfig, N extends Node, E extends Edge> = {
   [K in keyof Q]: ConvertHandler<Q, Q[K], N, E>;
 };
 

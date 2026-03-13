@@ -8,7 +8,7 @@ import type {
   Edge,
   FullCaptureResult,
   Node,
-  Query,
+  QueryConfig,
   SingleCaptureResult,
 } from "@/models";
 import type { QueryMap } from "@/query";
@@ -48,7 +48,7 @@ function createConvertResult<N extends Node, E extends Edge>(): ConvertResult<
  *
  * The single-tag overload is intended for recursive capture inside convert functions,
  * where only a specific construct is expected within a body node.
- * @template Q A type defined in form of {@link Query}.
+ * @template Q A type defined in form of {@link QueryConfig}.
  * @param query The query map containing compiled tree-sitter queries keyed by tag.
  * @param config Per-tag configuration declaring additional parent node types to include.
  * @returns A bound capture function.
@@ -56,7 +56,7 @@ function createConvertResult<N extends Node, E extends Edge>(): ConvertResult<
  * // plugin/src/index.ts
  * export const capture = createCapture<Query>(query, queryConfig);
  */
-function createCapture<Q extends Query>(
+function createCapture<Q extends QueryConfig>(
   query: QueryMap<keyof Q & string>,
   config: CaptureConfig<Q>,
 ) {
@@ -82,6 +82,7 @@ function createCapture<Q extends Query>(
     node: TSParser.SyntaxNode,
     tag: K,
   ): SingleCaptureResult<Q[K]>[];
+
   function capture<K extends keyof Q>(
     node: TSParser.SyntaxNode,
     tag?: K,
@@ -95,14 +96,19 @@ function createCapture<Q extends Query>(
     }
 
     return query
-      .match(tag as keyof Q & string, node, config[tag]?.include)
+      .match(
+        tag as keyof Q & string,
+        node,
+        config[tag]?.typesToInclude,
+        config[tag]?.maxStartDepth,
+      )
       .map(toCapture);
   }
 
   return capture;
 }
 
-function createConvert<Q extends Query, N extends Node, E extends Edge>(
+function createConvert<Q extends QueryConfig, N extends Node, E extends Edge>(
   capture: ReturnType<typeof createCapture<Q>>,
   config: ConvertConfig<Q, N, E>,
 ) {

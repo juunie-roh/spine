@@ -62,6 +62,6 @@ type QueryTag = {
   optional: string;
 };
 
-type Query = Record<string, QueryTag>;
+type QueryConfig = Record<string, QueryTag>;
 
-export type { Edge, Node, Query, QueryTag };
+export type { Edge, Node, QueryConfig, QueryTag };
