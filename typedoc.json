@@ -7,7 +7,7 @@
     "src/query/index.ts",
     "src/utils/index.ts"
   ],
-  "out": "docs",
+  "out": "docs/api",
   "name": "symbex",
   "includeVersion": true,
   "excludePrivate": false,
