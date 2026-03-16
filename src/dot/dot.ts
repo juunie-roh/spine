@@ -11,11 +11,17 @@ type DotGraphOptions = {
 
 function printDotGraph(
   graph: Serialized,
-  { name = "symbex", rankdir = "LR", indent: space = 0 }: DotGraphOptions,
+  { name = "symbex", rankdir = "TB", indent: space = 0 }: DotGraphOptions,
 ) {
   const lines: string[] = [
     `digraph ${JSON.stringify(name)} {`,
     `${indent(space)}rankdir=${rankdir};`,
+    `${indent(space)}compound=true;`,
+    `${indent(space)}newrank=true;`,
+    `${indent(space)}splines=spline;`,
+    `${indent(space)}graph [fontname="JetBrains Mono" fontsize=12 pad=0.3]`,
+    `${indent(space)}node [fontname="JetBrains Mono" shape=box style="rounded"]`,
+    `${indent(space)}edge [fontname="JetBrains Mono" fontsize=8 color="#666"]`,
   ];
 
   lines.push(...nodesToDOT(graph.nodes, space));
@@ -82,7 +88,7 @@ function nodesToDOT(nodes: Serialized["nodes"], space: number): string[] {
       lines.push(`${indent(spc)}}`);
     } else {
       lines.push(
-        `${indent(spc)}${JSON.stringify(node.id)} [label=${JSON.stringify(`<${node.kind}>\n${label}`)}, group=${JSON.stringify(node.kind)}, tooltip=${JSON.stringify(node.path.join(" > "))}];`,
+        `${indent(spc)}${JSON.stringify(node.id)} [label=${JSON.stringify(`<${node.kind}>\n${label}`)}, group=${JSON.stringify(node.kind)}, tooltip=${JSON.stringify(node.path.join(" > "))}, shape=underline];`,
       );
     }
   };
@@ -95,9 +101,7 @@ function nodesToDOT(nodes: Serialized["nodes"], space: number): string[] {
     .filter((node) => node.kind === "module")
     .map((node) => JSON.stringify(node.id));
   if (moduleIds.length > 0) {
-    lines.push(
-      `${indent(space)}{ rank=min; subgraph ${moduleIds.join("; ")}; }`,
-    );
+    lines.push(`${indent(space)}{ rank=min; ${moduleIds.join("; ")}; }`);
   }
 
   return lines;
