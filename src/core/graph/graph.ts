@@ -165,6 +165,20 @@ class Graph<N extends Node = Node, E extends Edge = Edge> {
     return this._edges.get(from)?.get(to)?.has(kind) ?? false;
   }
 
+  /**
+   * Returns the {@link NodeId | `NodeId`} of the direct parent node in the scope chain,
+   * or `undefined` if the node has no registered parent.
+   * @param id - The `NodeId` of the node whose parent to look up.
+   * @returns The `NodeId` of the parent node, or `undefined` if `id` is a root node.
+   */
+  parent(id: NodeId): NodeId | undefined {
+    const path = this._registry.decode(id).slice(0, -1) as NodePath;
+
+    if (!this._registry.has(path)) return;
+
+    return this._registry.encode(path);
+  }
+
   destroy() {
     this._nodes.clear();
     this._edges.clear();
@@ -239,17 +253,9 @@ class Graph<N extends Node = Node, E extends Edge = Edge> {
     return this;
   }
 
-  private _parent(id: NodeId): NodeId | undefined {
-    const path = this._registry.decode(id);
-    const parentPath = path.slice(0, -1) as NodePath;
-
-    if (!this._registry.has(parentPath)) return;
-
-    return this._registry.encode(parentPath);
-  }
-
-  private _resolve(name: string, from: NodeId): NodeId {
-    // resolve id by name
+  // TODO: later, resolve all symbol references starting from the node.
+  private _resolve(symbol: string, from: NodeId): NodeId {
+    // resolve id by symbol
     let scope: NodeId | undefined = from;
     // bread-first-search with adjacent nodes
     while (scope !== undefined) {
@@ -259,20 +265,20 @@ class Graph<N extends Node = Node, E extends Edge = Edge> {
           const path = this._registry.decode(id);
           // get identifier (last element of path array)
           const identifier = path[path.length - 1];
-          if (identifier === name) {
+          if (identifier === symbol) {
             return id;
           }
         }
       }
       // continue search on parent
-      scope = this._parent(scope);
+      scope = this.parent(scope);
     }
 
     // TODO: Global resolution
 
     throw new GraphError(
       "GRAPH_NAME_RESOLUTION_FAILED",
-      `Failed to resolve ${name} from ${from}`,
+      `Failed to resolve ${symbol} from ${from}`,
     );
   }
 }
