@@ -1,6 +1,13 @@
 import TSParser from "tree-sitter";
 
-import type { Edge, Node, NodePath, QueryConfig } from "@/models";
+import type {
+  Edge,
+  Node,
+  NodePath,
+  PluginDescriptor,
+  QueryConfig,
+} from "@/models";
+import { QueryMap } from "@/query";
 import { createCapture, createConvert } from "@/utils";
 
 import CoreError from "./error";
@@ -11,7 +18,7 @@ import CoreError from "./error";
 class LanguagePlugin {
   private _parser: TSParser;
 
-  private _module: LanguagePlugin.Module;
+  private _module: PluginDescriptor;
 
   private _capture: ReturnType<typeof createCapture<QueryConfig>>;
 
@@ -20,16 +27,12 @@ class LanguagePlugin {
   constructor(name: string) {
     this._module = LanguagePlugin.load(name);
 
-    type Q = typeof this._module.queryConfig;
-    type N = (typeof this._module.nodeKind)[number];
-    type E = (typeof this._module.edgeKind)[number];
-
-    this._capture = createCapture<Q>(
+    this._capture = createCapture<QueryConfig>(
       this._module.query,
       this._module.captureConfig,
     );
 
-    this._convert = createConvert<Q, N, E>(
+    this._convert = createConvert<QueryConfig, Node, Edge>(
       this._capture,
       this._module.convertConfig,
     );
@@ -81,26 +84,14 @@ class LanguagePlugin {
 
 namespace LanguagePlugin {
   /**
-   * Plugin package module interface.
-   */
-  export interface Module {
-    language: TSParser.Language;
-    /**
-     * Temporary field.
-     * @todo Specify fields.
-     */
-    [k: string]: any;
-  }
-
-  /**
    * Loads a language module with the name provided.
    * @param name The npm package name of the plugin.
    * @returns The resolved module containing language, query string, and converter.
    * @throws If the package cannot be found under `node_modules`.
    * @throws If the loaded module is incompatible with {@link LanguagePlugin.Module | language module}.
    */
-  export function load(name: string): Module {
-    let m: Module;
+  export function load(name: string): PluginDescriptor {
+    let m: PluginDescriptor;
 
     try {
       require.resolve(name);
@@ -131,21 +122,33 @@ namespace LanguagePlugin {
    *
    * @param m A module to validate.
    */
-  function assertModule(m: unknown, name: string): asserts m is Module {
-    if (
-      typeof m === "object" &&
-      m !== null &&
-      "language" in m &&
-      typeof m.language === "object" &&
-      m.language !== null &&
-      isLanguage(m.language)
-    )
-      return;
+  function assertModule(
+    m: unknown,
+    name: string,
+  ): asserts m is PluginDescriptor {
+    const fail = (reason: string) => {
+      throw new CoreError(
+        "CORE_PLUGIN_LOAD_FAILED",
+        `Failed to load plugin "${name}": ${reason}`,
+      );
+    };
 
-    throw new CoreError(
-      "CORE_PLUGIN_LOAD_FAILED",
-      `Failed to load plugin "${name}": module is incompatible with plugin interface.`,
-    );
+    if (typeof m !== "object" || m === null) fail("module is not an object");
+
+    const mod = m as Record<string, unknown>;
+
+    if (!isLanguage(mod.language)) fail("missing or invalid 'language'");
+
+    if (!(mod.query instanceof QueryMap)) fail("missing or invalid 'query'");
+
+    if (typeof mod.queryConfig !== "object" || mod.queryConfig === null)
+      fail("missing or invalid 'queryConfig'");
+
+    if (typeof mod.captureConfig !== "object" || mod.captureConfig === null)
+      fail("missing or invalid 'captureConfig'");
+
+    if (typeof mod.convertConfig !== "object" || mod.convertConfig === null)
+      fail("missing or invalid 'convertConfig'");
   }
 
   /**

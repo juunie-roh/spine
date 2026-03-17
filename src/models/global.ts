@@ -79,15 +79,13 @@ export type QueryConfig = Record<
 >;
 
 export type PluginDescriptor<
-  Q extends QueryConfig,
-  N extends readonly string[],
-  E extends readonly string[],
+  Q extends QueryConfig = QueryConfig,
+  N extends Node = Node,
+  E extends Edge = Edge,
 > = {
   language: TSParser.Language;
   query: QueryMap<keyof Q & string>;
   queryConfig: Q;
   captureConfig: CaptureConfig<Q>;
-  convertConfig: ConvertConfig<Q, Node<N[number]>, Edge<E[number]>>;
-  nodeKind: N;
-  edgeKind: E;
+  convertConfig: ConvertConfig<Q, N, E>;
 };

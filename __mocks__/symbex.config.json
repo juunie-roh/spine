@@ -6,7 +6,7 @@
     },
     {
       "ext": ".tsx",
-      "name": "@juun-roh/symbex-tsx"
+      "name": "@symbex/tsx"
     }
   ]
 }
