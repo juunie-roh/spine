@@ -1,3 +1,3 @@
 # @juun-roh/symbex-tsx
 
-Test plugin for core library registration test.
+Test plugin for core library registration and plugin extension.
