@@ -5,7 +5,10 @@ import GraphError from "./error";
 import { HashRegistry } from "./hash-registry";
 
 type GraphNode<N extends Node = Node> = Omit<N, "path"> & { id: NodeId };
-type GraphEdge<E extends Edge = Edge> = E & { from: NodeId; to: NodeId };
+type GraphEdge<E extends Edge = Edge> = Pick<E, "kind"> & {
+  from: NodeId;
+  to: NodeId;
+};
 
 class Graph<N extends Node = Node, E extends Edge = Edge> {
   private _registry: HashRegistry;
@@ -13,7 +16,7 @@ class Graph<N extends Node = Node, E extends Edge = Edge> {
   private _edges: Map<NodeId, Map<NodeId, Set<GraphEdge<E>["kind"]>>>;
   private _edgeProps: Map<
     NodeId,
-    Map<NodeId, Map<GraphEdge<E>["kind"], GraphEdge<E>["props"]>>
+    Map<NodeId, Map<GraphEdge<E>["kind"], E["props"]>>
   >;
 
   constructor(nodes: N[], edges: E[]) {
@@ -51,10 +54,7 @@ class Graph<N extends Node = Node, E extends Edge = Edge> {
    */
   get edgeProps(): ReadonlyMap<
     NodeId,
-    ReadonlyMap<
-      NodeId,
-      ReadonlyMap<GraphEdge<E>["kind"], GraphEdge<E>["props"]>
-    >
+    ReadonlyMap<NodeId, ReadonlyMap<GraphEdge<E>["kind"], E["props"]>>
   > {
     return this._edgeProps;
   }
@@ -111,7 +111,7 @@ class Graph<N extends Node = Node, E extends Edge = Edge> {
     from: NodeId,
     to: NodeId,
     kind: GraphEdge<E>["kind"],
-  ): GraphEdge<E>["props"] {
+  ): E["props"] {
     return this._edgeProps.get(from)?.get(to)?.get(kind);
   }
 
@@ -179,6 +179,10 @@ class Graph<N extends Node = Node, E extends Edge = Edge> {
     return this._registry.encode(path);
   }
 
+  depth(id: NodeId): number {
+    return this._registry.decode(id).length - 1;
+  }
+
   destroy() {
     this._nodes.clear();
     this._edges.clear();
@@ -230,7 +234,7 @@ class Graph<N extends Node = Node, E extends Edge = Edge> {
     from: NodeId,
     to: NodeId,
     kind: GraphEdge<E>["kind"],
-    props: GraphEdge<E>["props"],
+    props: E["props"],
   ): this {
     if (!this._edgeProps.has(from)) {
       this._edgeProps.set(from, new Map());
