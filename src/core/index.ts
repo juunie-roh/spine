@@ -1,5 +1,5 @@
 import Graph from "./graph";
-import Language from "./language";
+import LanguagePlugin from "./language-plugin";
 import Parser from "./parser";
 
-export { Graph, Language, Parser };
+export { Graph, LanguagePlugin, Parser };

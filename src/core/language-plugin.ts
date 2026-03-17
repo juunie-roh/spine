@@ -3,18 +3,17 @@ import TSParser from "tree-sitter";
 import type { Edge, Node, NodePath } from "@/models";
 
 import CoreError from "./error";
-import type Graph from "./graph";
 
 /**
  * Represents a loaded and initialized symbex language plugin.
  */
-class Language {
+class LanguagePlugin {
   private _parser: TSParser;
 
-  private _module: Language.Module;
+  private _module: LanguagePlugin.Module;
 
   constructor(packageName: string) {
-    this._module = Language.load(packageName);
+    this._module = LanguagePlugin.load(packageName);
     this._parser = new TSParser();
     this._parser.setLanguage(this._module.language);
   }
@@ -58,13 +57,9 @@ class Language {
     const captures = this._module.capture(node);
     return this._module.convert(captures, [filePath] as NodePath);
   }
-
-  toDot<N extends Node = Node, E extends Edge = Edge>(graph: Graph<N, E>) {
-    return this._module.toDot(graph);
-  }
 }
 
-namespace Language {
+namespace LanguagePlugin {
   /**
    * Plugin package module interface.
    */
@@ -82,17 +77,27 @@ namespace Language {
    * @param name The npm package name of the plugin.
    * @returns The resolved module containing language, query string, and converter.
    * @throws If the package cannot be found under `node_modules`.
-   * @throws If the loaded module is incompatible with {@link Language.Module | language module}.
+   * @throws If the loaded module is incompatible with {@link LanguagePlugin.Module | language module}.
    */
   export function load(name: string): Module {
     let m: Module;
+
+    try {
+      require.resolve(name);
+    } catch (e) {
+      throw new CoreError(
+        "CORE_PLUGIN_LOAD_FAILED",
+        `Plugin "${name}" not found in node_modules`,
+        { cause: e },
+      );
+    }
 
     try {
       m = require(name);
     } catch (e) {
       throw new CoreError(
         "CORE_PLUGIN_LOAD_FAILED",
-        `Failed to load plugin "${name}"`,
+        `Plugin "${name}" threw during initialization`,
         { cause: e },
       );
     }
@@ -110,12 +115,31 @@ namespace Language {
   /**
    *
    * @param m A module to validate.
-   * @returns Whether the imported module satisfies the language module interface.
-   * @todo Specify module interface.
    */
   function isModule(m: unknown): m is Module {
-    return typeof m === "object" && m !== null && "language" in m;
+    return (
+      typeof m === "object" &&
+      m !== null &&
+      "language" in m &&
+      typeof m.language === "object" &&
+      m.language !== null &&
+      isLanguage(m.language)
+    );
+  }
+
+  function isLanguage(lang: unknown): lang is TSParser.Language {
+    return (
+      typeof lang === "object" &&
+      lang !== null &&
+      "name" in lang &&
+      lang.name !== null &&
+      "language" in lang &&
+      lang.language !== null &&
+      "nodeTypeInfo" in lang &&
+      lang.nodeTypeInfo !== null &&
+      Array.isArray(lang.nodeTypeInfo)
+    );
   }
 }
 
-export default Language;
+export default LanguagePlugin;
