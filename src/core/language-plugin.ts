@@ -141,9 +141,6 @@ namespace LanguagePlugin {
 
     if (!(mod.query instanceof QueryMap)) fail("missing or invalid 'query'");
 
-    if (typeof mod.queryConfig !== "object" || mod.queryConfig === null)
-      fail("missing or invalid 'queryConfig'");
-
     if (typeof mod.captureConfig !== "object" || mod.captureConfig === null)
       fail("missing or invalid 'captureConfig'");
 
