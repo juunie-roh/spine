@@ -75,7 +75,7 @@ export interface Edge<K extends string = string> {
 
 export type QueryConfig = Record<
   string,
-  { required: readonly string[]; optional: readonly string[] }
+  { required: string; optional: string }
 >;
 
 export type PluginDescriptor<
@@ -85,7 +85,6 @@ export type PluginDescriptor<
 > = {
   language: TSParser.Language;
   query: QueryMap<keyof Q & string>;
-  queryConfig: Q;
   captureConfig: CaptureConfig<Q>;
   convertConfig: ConvertConfig<Q, N, E>;
 };
