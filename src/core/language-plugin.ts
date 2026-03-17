@@ -85,10 +85,6 @@ class LanguagePlugin {
 namespace LanguagePlugin {
   /**
    * Loads a language module with the name provided.
-   * @param name The npm package name of the plugin.
-   * @returns The resolved module containing language, query string, and converter.
-   * @throws If the package cannot be found under `node_modules`.
-   * @throws If the loaded module is incompatible with {@link LanguagePlugin.Module | language module}.
    */
   export function load(name: string): PluginDescriptor {
     let m: PluginDescriptor;
