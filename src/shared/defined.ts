@@ -1,11 +1,11 @@
-import { SpineError } from "./error";
+import { SymbexError } from "./error";
 
-function defined(value: boolean, error?: SpineError): asserts value;
+function defined(value: boolean, error?: SymbexError): asserts value;
 function defined<T>(
   value: T | null | undefined,
-  error?: SpineError,
+  error?: SymbexError,
 ): asserts value is T;
-function defined(value: any, error?: SpineError) {
+function defined(value: any, error?: SymbexError) {
   if (value === false || value === null || typeof value === "undefined") {
     throw error ?? new Error("Unspecified undefined error");
   }

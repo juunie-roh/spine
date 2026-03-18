@@ -1,8 +1,8 @@
-import { SpineError, SpineErrorCode } from "@/shared/error";
+import { SymbexError, SymbexErrorCode } from "@/shared/error";
 
-type BinaryErrorCode = Extract<SpineErrorCode, `BIN_${string}`>;
+type BinaryErrorCode = Extract<SymbexErrorCode, `BIN_${string}`>;
 
-class BinaryError extends SpineError {
+class BinaryError extends SymbexError {
   constructor(code: BinaryErrorCode, message: string, options?: ErrorOptions) {
     super(code, message, options);
   }

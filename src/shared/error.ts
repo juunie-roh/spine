@@ -1,6 +1,7 @@
-export type SpineErrorCode =
+export type SymbexErrorCode =
   // binary
   | "BIN_ERROR"
+  | "BIN_MODULE_NOT_FOUND"
   // config
   | "CONFIG_INVALID_PATH"
   | "CONFIG_INVALID_SCHEMA"
@@ -22,10 +23,10 @@ export type SpineErrorCode =
   | "QUERY_SET_DUPLICATE_KEY"
   | "QUERY_GET_INVALID_KEY";
 
-export class SpineError extends Error {
-  readonly code: SpineErrorCode;
+export class SymbexError extends Error {
+  readonly code: SymbexErrorCode;
 
-  constructor(code: SpineErrorCode, message: string, options?: ErrorOptions) {
+  constructor(code: SymbexErrorCode, message: string, options?: ErrorOptions) {
     super(message, options);
     this.name = this.constructor.name;
     this.code = code;

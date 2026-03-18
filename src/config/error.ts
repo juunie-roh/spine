@@ -1,8 +1,8 @@
-import { SpineError, SpineErrorCode } from "@/shared/error";
+import { SymbexError, SymbexErrorCode } from "@/shared/error";
 
-type ConfigErrorCode = Extract<SpineErrorCode, `CONFIG_${string}`>;
+type ConfigErrorCode = Extract<SymbexErrorCode, `CONFIG_${string}`>;
 
-class ConfigError extends SpineError {
+class ConfigError extends SymbexError {
   constructor(code: ConfigErrorCode, message: string, options?: ErrorOptions) {
     super(code, message, options);
   }

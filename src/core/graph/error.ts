@@ -1,8 +1,8 @@
-import { SpineError, SpineErrorCode } from "@/shared/error";
+import { SymbexError, SymbexErrorCode } from "@/shared/error";
 
-type GraphErrorCode = Extract<SpineErrorCode, `GRAPH_${string}`>;
+type GraphErrorCode = Extract<SymbexErrorCode, `GRAPH_${string}`>;
 
-class GraphError extends SpineError {
+class GraphError extends SymbexError {
   constructor(code: GraphErrorCode, message: string, options?: ErrorOptions) {
     super(code, message, options);
   }

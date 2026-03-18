@@ -1,8 +1,8 @@
-import { SpineError, SpineErrorCode } from "@/shared/error";
+import { SymbexError, SymbexErrorCode } from "@/shared/error";
 
-type QueryErrorCode = Extract<SpineErrorCode, `QUERY_${string}`>;
+type QueryErrorCode = Extract<SymbexErrorCode, `QUERY_${string}`>;
 
-class QueryError extends SpineError {
+class QueryError extends SymbexError {
   constructor(code: QueryErrorCode, message: string, options?: ErrorOptions) {
     super(code, message, options);
   }
