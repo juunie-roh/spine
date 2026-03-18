@@ -77,7 +77,13 @@ class LanguagePlugin {
     node: TSParser.SyntaxNode,
   ): { edges: Edge[]; nodes: Node[] } {
     const captures = this._capture(node);
-    return this._convert(captures, [filePath] as NodePath);
+    const result = this._convert(captures, [filePath] as NodePath);
+    result.nodes.push({
+      path: [filePath] as NodePath,
+      kind: "module",
+      type: "scope",
+    });
+    return result;
   }
 }
 

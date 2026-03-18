@@ -8,7 +8,6 @@ import { createCommand } from "@commander-js/extra-typings";
 import { loadConfig } from "@/config";
 import { Graph, Parser } from "@/core";
 import { printDotGraph } from "@/dot";
-import type { NodePath } from "@/models";
 import { SymbexError } from "@/shared/error";
 
 import pkg from "../../package.json";
@@ -42,12 +41,6 @@ const program = createCommand()
       file,
       readFileSync(file, options.encoding),
     );
-    // add root file node once
-    nodes.push({
-      path: [file] as NodePath,
-      kind: "module",
-      type: "scope",
-    });
 
     const graph = new Graph(nodes, edges);
 
