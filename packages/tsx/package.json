@@ -17,7 +17,8 @@
   "scripts": {
     "build": "tsup",
     "check-types": "tsc -p ./tsconfig.json --noEmit",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "dev:query": "pnpm symbex query --grammar tree-sitter-typescript --grammar-spec tsx"
   },
   "keywords": [],
   "author": "Juun",
