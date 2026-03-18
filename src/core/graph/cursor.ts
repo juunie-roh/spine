@@ -7,7 +7,7 @@ import type Graph from "./graph";
  */
 class GraphCursor {
   private readonly _graph: Graph;
-  private _id: NodeId;
+  private readonly _id: NodeId;
 
   constructor(graph: Graph, id: NodeId) {
     this._graph = graph;
