@@ -51,8 +51,8 @@ export type QueryConfig = {
     optional: "pattern" | "name" | "default" | "key";
   };
   type: {
-    required: string;
-    optional: string;
+    required: "node" | "name" | "type";
+    optional: "type_parameters";
   };
   variable: {
     required: "node" | "pattern" | "kind";
