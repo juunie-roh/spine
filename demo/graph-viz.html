@@ -81,8 +81,9 @@
     /* ── Edges ─────────────────────────────────────────────────────── */
     .edge { fill: none; }
     .edge-defines  { stroke: #444c56; stroke-width: 1px; }
+    .edge-contains { stroke: #7a6a00; stroke-width: 1px; stroke-dasharray: 4 2; opacity: .75; }
     .edge-imports  { stroke: #388bfd; stroke-width: 1px; stroke-dasharray: 5 3; opacity: .7; }
-    .edge-inherits { stroke: #a371f7; stroke-width: 1px; stroke-dasharray: 3 2; opacity: .7; }
+    .edge-extends  { stroke: #d2a8ff; stroke-width: 1px; stroke-dasharray: 3 2; opacity: .65; }
     .edge.sf { opacity: .04; }
 
     /* ── Nodes ─────────────────────────────────────────────────────── */
@@ -306,11 +307,14 @@
       <marker id="arr-defines"  markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
         <path d="M0,0.5 L0,5.5 L5.5,3 z" fill="#555" />
       </marker>
+      <marker id="arr-contains" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+        <path d="M0,0.5 L0,5.5 L5.5,3 z" fill="#7a6a00" opacity=".9" />
+      </marker>
       <marker id="arr-imports"  markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
         <path d="M0,0.5 L0,5.5 L5.5,3 z" fill="#388bfd" opacity=".9" />
       </marker>
-      <marker id="arr-inherits" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
-        <path d="M0,0.5 L0,5.5 L5.5,3 z" fill="#a371f7" opacity=".9" />
+      <marker id="arr-extends"  markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+        <path d="M0,0.5 L0,5.5 L5.5,3 z" fill="#d2a8ff" opacity=".9" />
       </marker>
     </defs>
     <g id="root"></g>
@@ -358,12 +362,15 @@ const KINDS = {
   variable:        { fill: '#280d0a', stroke: '#f78166', r:  5 },
   pattern:         { fill: '#091f1f', stroke: '#56d364', r:  5 },
   import:          { fill: '#001828', stroke: '#388bfd', r:  5 },
+  parameter:       { fill: '#1a0f0a', stroke: '#c9733b', r:  5 },
+  iife:            { fill: '#1c1200', stroke: '#e3b341', r:  8 },
 };
 
 const EDGES = {
   defines:  { cls: 'edge-defines',  color: '#555',    marker: 'arr-defines'  },
+  contains: { cls: 'edge-contains', color: '#7a6a00', marker: 'arr-contains' },
   imports:  { cls: 'edge-imports',  color: '#388bfd', marker: 'arr-imports'  },
-  inherits: { cls: 'edge-inherits', color: '#a371f7', marker: 'arr-inherits' },
+  extends:  { cls: 'edge-extends',  color: '#d2a8ff', marker: 'arr-extends'  },
 };
 
 function kfg(d) {
