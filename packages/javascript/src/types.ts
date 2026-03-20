@@ -14,8 +14,8 @@ export type QueryConfig = {
     optional: "is_static" | "decorator";
   };
   variable: {
-    required: "node" | "pattern" | "kind";
-    optional: "name";
+    required: "node" | "name" | "kind";
+    optional: never;
   };
   class: {
     required: "node" | "name" | "body";

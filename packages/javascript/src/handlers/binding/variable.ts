@@ -14,7 +14,7 @@ const variableHandler: ConvertHandler<"variable"> = (captures, parent) => {
   ]);
 
   for (const c of captures) {
-    const { pattern, node, kind, name } = c;
+    const { node, kind, name } = c;
 
     const declarator = node.namedChildren.find(
       (c) => c.type === "variable_declarator",
@@ -27,7 +27,7 @@ const variableHandler: ConvertHandler<"variable"> = (captures, parent) => {
       continue;
     }
 
-    if (name) {
+    if (name.type === "identifier") {
       const path = createChildPath(parent, name.text);
       result.edges.push({
         from: parent,
@@ -41,9 +41,9 @@ const variableHandler: ConvertHandler<"variable"> = (captures, parent) => {
         at: getRange(node),
         props: { kind: kind.text },
       });
-    } else if (pattern) {
-      for (const { name, has_default } of flatPattern(pattern)) {
-        const path = createChildPath(parent, name);
+    } else {
+      for (const { name: nm, node: n, has_default } of flatPattern(name)) {
+        const path = createChildPath(parent, nm);
         result.edges.push({
           from: parent,
           to: path,
@@ -53,7 +53,7 @@ const variableHandler: ConvertHandler<"variable"> = (captures, parent) => {
           path,
           type: "binding",
           kind: "variable",
-          at: getRange(node),
+          at: getRange(n),
           props: { kind: kind.text, has_default },
         });
       }
