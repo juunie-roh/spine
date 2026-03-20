@@ -20,7 +20,7 @@
     "node": "^22.13.0 || >=24"
   },
   "main": "dist/index.js",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "bin": "dist/bin/symbex.js",
   "files": [
     "dist"
@@ -29,23 +29,33 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./config": {
       "types": "./dist/config/index.d.ts",
+      "import": "./dist/config/index.mjs",
+      "require": "./dist/config/index.js",
       "default": "./dist/config/index.js"
     },
     "./dot": {
       "types": "./dist/dot/index.d.ts",
+      "import": "./dist/dot/index.mjs",
+      "require": "./dist/dot/index.js",
       "default": "./dist/dot/index.js"
     },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.mjs",
+      "require": "./dist/utils/index.js",
       "default": "./dist/utils/index.js"
     },
     "./query": {
-      "types": "./dist/query/index.d.ts",
-      "default": "./dist/query/index.js"
+      "types": "./dist/utils/query/index.d.ts",
+      "import": "./dist/utils/query/index.mjs",
+      "require": "./dist/utils/query/index.js",
+      "default": "./dist/utils/query/index.js"
     }
   },
   "scripts": {

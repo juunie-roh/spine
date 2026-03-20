@@ -1,14 +1,17 @@
 import { scmPlugin } from "symbex/query";
-import { defineConfig } from "tsup";
+import { defineConfig, type Options } from "tsup";
 
-export default defineConfig({
+const options: Options = {
   clean: true,
-  dts: true,
   entry: ["src/index.ts"],
   esbuildPlugins: [scmPlugin],
-  format: "cjs",
-  minify: true,
+  minify: false,
   target: ["node22", "node24", "node25"],
   external: ["symbex", "tree-sitter-typescript"],
-  sourcemap: true,
-});
+  sourcemap: false,
+};
+
+export default defineConfig([
+  { ...options, dts: true, format: "cjs" },
+  { ...options, dts: false, format: "esm" },
+]);
