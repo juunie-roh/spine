@@ -18,14 +18,7 @@ export type NodePathString = Branded<string, "NODE_PATH_STRING">;
 
 export type NodeSource = { name: string; external?: boolean };
 
-/**
- * @template K - String union of valid `kind` values for this node. Defaults to
- * `string` for untyped use; narrow it to a literal union to get type-safe `kind` access.
- * @example
- * import type * as symbex from "symbex";
- * type Node = symbex.Node<"node kind" | "string literals">;
- */
-export interface Node<K extends string = string> {
+type BaseNode<K extends string = string> = {
   /**
    * Unique human-readable signature identifying the node.
    */
@@ -35,10 +28,6 @@ export interface Node<K extends string = string> {
    */
   kind: K;
   /**
-   * Type of the node.
-   */
-  type: "scope" | "anonymous" | "binding";
-  /**
    * A position where does the node sit in the file. If the node is from outside the file, {@link NodeSource | source}.
    * @see {@link TSParser.Range | tree-sitter `Range`}
    */
@@ -47,7 +36,38 @@ export interface Node<K extends string = string> {
    * Language-specific property supplements.
    */
   props?: Record<string, unknown>;
-}
+};
+
+type ScopeNode<K extends string = string> = BaseNode<K> & {
+  /**
+   * Type of the node.
+   */
+  type: "scope" | "anonymous";
+  /**
+   * Start index of the inner block.
+   */
+  blockStartIndex: number;
+};
+
+type BindingNode<K extends string = string> = BaseNode<K> & {
+  /**
+   * Type of the node.
+   */
+  type: "binding";
+  /**
+   * Start index of the inner block.
+   */
+  blockStartIndex?: never;
+};
+
+/**
+ * @template K - String union of valid `kind` values for this node. Defaults to
+ * `string` for untyped use; narrow it to a literal union to get type-safe `kind` access.
+ * @example
+ * import type * as symbex from "symbex";
+ * type Node = symbex.Node<"node kind" | "string literals">;
+ */
+export type Node<K extends string = string> = ScopeNode<K> | BindingNode<K>;
 
 /**
  * @template K - String union of valid `kind` values for this edge. Defaults to
@@ -80,13 +100,14 @@ export type QueryConfig = Record<
   { required: string; optional: string }
 >;
 
-export type PluginDescriptor<
+export interface PluginDescriptor<
   Q extends QueryConfig = QueryConfig,
   N extends Node = Node,
   E extends Edge = Edge,
-> = {
+> {
   language: TSParser.Language;
   query: QueryMap<keyof Q & string>;
   captureConfig: CaptureConfig<Q>;
   convertConfig: ConvertConfig<Q, N, E>;
-};
+  references: (node: TSParser.SyntaxNode) => string[];
+}
