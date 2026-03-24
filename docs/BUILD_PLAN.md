@@ -127,7 +127,7 @@ interface Node<K extends string = string> {
   path: NodePath;          // scope-chain segments, e.g. ["src/utils/parse.ts", "parseDate"]
   kind: K;
   type: "scope" | "anonymous" | "binding";
-  at: TSParser.Range | NodeSource;  // position in file, OR source module for imports
+  at: Parser.Range | NodeSource;  // position in file, OR source module for imports
   props?: Record<string, unknown>;  // language-specific, core carries but does not interpret
 }
 
@@ -209,11 +209,11 @@ These are separate concerns. Declaration extraction builds the graph. Reference 
 
 ```ts
 type PluginDescriptor = {
-  language: TSParser.Language;
+  language: Parser.Language;
   query: QueryMap;
   captureConfig: CaptureConfig;
   convertConfig: ConvertConfig;
-  getReferences: (body: TSParser.SyntaxNode) => string[];  // reference extraction
+  getReferences: (body: Parser.SyntaxNode) => string[];  // reference extraction
 };
 ```
 
