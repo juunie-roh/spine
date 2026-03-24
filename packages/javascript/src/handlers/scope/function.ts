@@ -26,6 +26,7 @@ const functionHandler: ConvertHandler<"function"> = (
       type: "scope",
       kind: "function",
       at: getRange(node),
+      blockStartIndex: body.startIndex,
       props: { is_async: !!is_async },
     });
 

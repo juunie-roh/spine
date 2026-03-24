@@ -22,11 +22,10 @@ const iifeHandler: ConvertHandler<"iife"> = (
       type: "anonymous",
       kind: "iife",
       at: getRange(node),
+      blockStartIndex: body.startIndex,
     });
 
-    if (body) {
-      result.push(convert(capture(body), path));
-    }
+    result.push(convert(capture(body), path));
   }
 
   return result;

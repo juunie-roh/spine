@@ -30,8 +30,8 @@ const methodHandler: ConvertHandler<"method"> = (
       type: "scope",
       kind: "method",
       at: getRange(node),
+      blockStartIndex: body.startIndex,
       props: {
-        name: name.text,
         is_static: !!is_static,
         is_async: !!is_async,
         decorator: decorators,

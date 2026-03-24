@@ -30,16 +30,15 @@ const classHandler: ConvertHandler<"class"> = (
       type: "scope",
       kind: "class",
       at: getRange(node),
+      blockStartIndex: body.startIndex,
       props: {
         extends: ext?.text,
         decorator: decorators,
       },
     });
 
-    if (body) {
-      result.push(convert(capture(body, "method"), path, "method"));
-      result.push(convert(capture(body, "member"), path, "member"));
-    }
+    result.push(convert(capture(body, "method"), path, "method"));
+    result.push(convert(capture(body, "member"), path, "member"));
   }
 
   return result;
