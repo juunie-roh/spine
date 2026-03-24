@@ -38,7 +38,26 @@ class Workspace {
   trace(filePath: string, target: Parser.Point | number) {
     const { graph, tree, language } = this.get(filePath);
     const cursor = GraphCursor.at(graph, target);
-    const references = this._handler.references(tree, cursor, language);
+
+    const cursorNode = cursor.node;
+
+    let offset: number;
+
+    if (cursorNode.type !== "binding") {
+      // for scope node, set start index as its block start index
+      offset = cursorNode.blockStartIndex;
+    } else if ("name" in cursorNode.at) {
+      // if the node is an imported module, start at root
+      offset = 0;
+    } else {
+      // neither, then set start index at the node's.
+      offset = cursorNode.at.startIndex;
+    }
+
+    const node =
+      tree.rootNode.descendantForIndex(offset).parent ?? tree.rootNode;
+
+    const references = this._handler.references(node, language);
 
     // temporary logs of result
     console.log(cursor.name, cursor.node.at, cursor.node.blockStartIndex);
@@ -58,6 +77,11 @@ class Workspace {
         );
       }
     }
+  }
+
+  destroy(): void {
+    this._handler.destroy();
+    this._files.clear();
   }
 }
 

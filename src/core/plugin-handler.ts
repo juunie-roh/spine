@@ -7,7 +7,6 @@ import { defined } from "@/shared/defined";
 
 import CoreError from "./error";
 import Graph from "./graph";
-import GraphCursor from "./graph/cursor";
 import Plugin from "./plugin";
 
 namespace PluginHandler {
@@ -70,16 +69,7 @@ class PluginHandler {
     };
   }
 
-  /**
-   * @param tree A tree from which to search for references.
-   * @param cursor Position at which to start searching for references.
-   * @param pluginName A name of the plugin.
-   */
-  references(
-    tree: Parser.Tree,
-    cursor: GraphCursor,
-    pluginName: string,
-  ): string[] {
+  references(node: Parser.SyntaxNode, pluginName: string): string[] {
     const plugin = this.plugins.get(pluginName);
     if (!this.plugins.has(pluginName))
       throw new CoreError(
@@ -88,27 +78,6 @@ class PluginHandler {
       );
     defined(plugin);
 
-    let offset: number;
-
-    const cursorNode = cursor.node;
-
-    if (cursorNode.type !== "binding") {
-      // for scope node, set start index as its block start index
-      offset = cursorNode.blockStartIndex;
-    } else if ("name" in cursorNode.at) {
-      // if the node is an imported module, start at root
-      offset = 0;
-    } else {
-      // neither, then set start index at the node's.
-      offset = cursorNode.at.startIndex;
-    }
-
-    // const treeCursor = tree.walk();
-    // treeCursor.gotoFirstChildForIndex(offset);
-    const node =
-      tree.rootNode.descendantForIndex(offset).parent ?? tree.rootNode;
-
-    // const node: Parser.SyntaxNode = treeCursor.currentNode;
     return plugin.references(node);
   }
 
