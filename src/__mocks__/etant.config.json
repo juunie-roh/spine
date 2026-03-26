@@ -2,15 +2,15 @@
   "language": [
     {
       "ext": ".js",
-      "name": "@etant/javascript"
+      "name": "@etant/js"
     },
     {
       "ext": ".mjs",
-      "name": "@etant/javascript"
+      "name": "@etant/js"
     },
     {
       "ext": ".jsx",
-      "name": "@etant/javascript"
+      "name": "@etant/js"
     }
   ]
 }
