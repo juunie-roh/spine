@@ -30,6 +30,10 @@
         "async"? @is_async
         parameters: (formal_parameters) @params
         body: (statement_block) @body)
+      (generator_function
+        "async"? @is_async
+        parameters: (formal_parameters) @params
+        body: (statement_block) @body)
     ])
 ) @node
 
@@ -45,6 +49,10 @@
         parameters: (formal_parameters)? @params
         body: (_) @body)
       (function_expression
+        "async"? @is_async
+        parameters: (formal_parameters) @params
+        body: (statement_block) @body)
+      (generator_function
         "async"? @is_async
         parameters: (formal_parameters) @params
         body: (statement_block) @body)

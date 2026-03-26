@@ -6,26 +6,9 @@ import flatPattern from "../utility/pattern";
 
 const variableHandler: ConvertHandler<"variable"> = (captures, parent) => {
   const result = createConvertResult<Node, Edge>();
-  const excludes = new Set([
-    "arrow_function",
-    "function_expression",
-    "generator_function",
-    "class",
-  ]);
 
   for (const c of captures) {
     const { node, kind, name } = c;
-
-    const declarator = node.namedChildren.find(
-      (c) => c.type === "variable_declarator",
-    );
-    // exclude value node types:
-    if (
-      declarator?.childForFieldName("value")?.type &&
-      excludes.has(declarator.childForFieldName("value")!.type)
-    ) {
-      continue;
-    }
 
     if (name.type === "identifier") {
       const path = createChildPath(parent, name.text);
