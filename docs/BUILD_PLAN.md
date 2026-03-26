@@ -208,16 +208,16 @@ These are separate concerns. Declaration extraction builds the graph. Reference 
 ### Plugin Descriptor
 
 ```ts
-type PluginDescriptor = {
+type Plugin.Descriptor = {
   language: Parser.Language;
   query: QueryMap;
   captureConfig: CaptureConfig;
   convertConfig: ConvertConfig;
-  getReferences: (body: Parser.SyntaxNode) => string[];  // reference extraction
+  references: (body: Parser.SyntaxNode) => string[];  // reference extraction
 };
 ```
 
-`getReferences` is a pure function that walks a tree-sitter subtree (typically a function/method body) and returns all referenced identifier names. For JavaScript, this is `flatExpression` — it recurses through expression node types, bottoming out at `identifier` nodes that represent scope-walk targets. `member_expression` only recurses into the object (root reference), not the property — `foo.bar.baz` yields `["foo"]`.
+`references` is a pure function that walks a tree-sitter subtree (typically a function/method body) and returns all referenced identifier names. For JavaScript, this is `flatExpression` — it recurses through expression node types, bottoming out at `identifier` nodes that represent scope-walk targets. `member_expression` only recurses into the object (root reference), not the property — `foo.bar.baz` yields `["foo"]`.
 
 ### Capture / Convert Pipeline
 

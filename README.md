@@ -97,10 +97,10 @@ The `GraphCursor` is the primary interface for comprehension:
 
 ### Plugin System
 
-Each language lives in `packages/<lang>/` as a separate workspace package, loaded at runtime. A plugin exports a `PluginDescriptor`:
+Each language lives in `packages/<lang>/` as a separate workspace package, loaded at runtime. A plugin exports a `Plugin.Descriptor`:
 
 ```ts
-type PluginDescriptor = {
+type Plugin.Descriptor = {
   language: Parser.Language;       // tree-sitter language binding
   query: QueryMap;                   // compiled queries map
   captureConfig: CaptureConfig;      // capture configuration with bypass
