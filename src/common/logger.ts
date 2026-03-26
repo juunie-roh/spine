@@ -58,9 +58,7 @@ namespace Logger {
   }
 
   export const LABEL_PAD = Math.max(
-    ...Object.keys(Logger.Level)
-      .filter((k) => Number.isNaN(Number(k)))
-      .map((k) => k.length),
+    ...Object.keys(Logger.Level).map((k) => k.length),
   );
 }
 

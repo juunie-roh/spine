@@ -15,7 +15,7 @@ class Workspace {
     this._files = new Map();
   }
 
-  @Log({ level: "debug" })
+  @Log({ level: "debug", label: "Workspace.open" })
   open(filePath: string, source: string): PluginHandler.ParseResult {
     const parsed = this._handler.parse(filePath, source);
     this._files.set(filePath, parsed);
@@ -37,7 +37,7 @@ class Workspace {
     return this._files.has(filePath);
   }
 
-  @Log({ level: "debug" })
+  @Log({ level: "debug", label: "Workspace.trace" })
   trace(filePath: string, target: Offset) {
     const { language, cursor, node } = this._syncOffset(filePath, target);
 
@@ -60,7 +60,11 @@ class Workspace {
     }
   }
 
-  @Log({ level: "debug", message: "Workspace Destroyed" })
+  @Log({
+    level: "debug",
+    label: "Workspace.destroy",
+    message: "Workspace Destroyed",
+  })
   destroy(): void {
     this._handler.destroy();
     this._files.clear();
@@ -69,7 +73,7 @@ class Workspace {
   /**
    * Synchronize a node with given offset.
    */
-  @Log({ level: "debug" })
+  @Log({ level: "debug", label: "Workspace._syncOffset" })
   private _syncOffset(
     filePath: string,
     target: Offset,

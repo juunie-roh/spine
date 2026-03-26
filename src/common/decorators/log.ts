@@ -4,6 +4,7 @@ namespace Log {
   export interface Options {
     /** Which level to emit log. */
     level?: keyof typeof Logger.Level;
+    label?: string;
     message?: string;
   }
 
@@ -80,7 +81,7 @@ function apply(
 ): unknown {
   const logger = Logger.get();
   const level = options.level ?? "info";
-  const name = String(context.name ?? "anonymous");
+  const name = options.label ?? String(context.name ?? "anonymous");
   const message = options.message;
 
   const qualify = (self: unknown): string => {
@@ -90,7 +91,7 @@ function apply(
 
   switch (context.kind) {
     case "class":
-      context.addInitializer(function () {
+      context.addInitializer(() => {
         logger[level](`new ${name}`);
         if (message) logger[level](message);
       });
@@ -101,14 +102,15 @@ function apply(
       return function (this: unknown, ...args: unknown[]): unknown {
         const name = qualify(this);
         logger[level](`${name} called`);
-        const s = performance.now();
+        // check performance only at the "debug" level.
+        const s = level === "debug" ? performance.now() : undefined;
         try {
           const result = method.call(this, ...args);
           if (result instanceof Promise) {
             return result
               .then((value) => {
                 if (message) logger[level](message);
-                logger[level](`${name} ended (${elapsed(s)})`);
+                logger[level](`${name} ended ${elapsed(s)}`);
                 return value;
               })
               .catch((err) => {
@@ -117,7 +119,7 @@ function apply(
               }) as typeof result;
           }
           if (message) logger[level](message);
-          logger[level](`${name} ended (${elapsed(s)})`);
+          logger[level](`${name} ended ${elapsed(s)}`);
           return result;
         } catch (err) {
           logger.error(`${name} threw`, err);
@@ -154,9 +156,12 @@ function apply(
   }
 }
 
-function elapsed(start: number): string {
+function elapsed(start?: number): string {
+  if (!start) return "";
   const ms = performance.now() - start;
-  return ms < 1000 ? `${ms.toFixed(1)}ms` : `${(ms / 1000).toFixed(2)}s`;
+  const formatted =
+    ms < 1000 ? `${ms.toFixed(1)}ms` : `${(ms / 1000).toFixed(2)}s`;
+  return `(${formatted})`;
 }
 
 export default Log;
