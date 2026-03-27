@@ -5,9 +5,8 @@ import WorkspaceError from "../error";
 
 /**
  * Normalizes the **first** argument of the decorated method to a path relative
- * to `this.rootDir`. If the first argument is an absolute path, it is converted
- * to a path relative to the resolved `rootDir`; relative paths have any leading
- * `./` stripped.
+ * to `this.rootDir`. Both absolute and relative paths are resolved against the
+ * anchor before being made relative, so behavior is consistent across platforms.
  *
  * **NOTE**: The decorated class must expose a `rootDir` property.
  *
@@ -23,9 +22,7 @@ function NormalizePath<
   return function (this: This, ...args: Args): Return {
     const anchor = path.resolve(cwd(), this.rootDir);
     const [first, ...rest] = args;
-    const relative = path.isAbsolute(first)
-      ? path.relative(anchor, first)
-      : first.replace(/^\.\//, "");
+    const relative = path.relative(anchor, path.resolve(anchor, first));
 
     if (relative.startsWith("..")) {
       throw new WorkspaceError(

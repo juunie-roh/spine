@@ -17,7 +17,7 @@ export default defineConfig({
     exclude: ["**/node_modules/**"],
     environment: "node",
     coverage: {
-      include: ["src/**", "packages/javascript/src/**"],
+      include: ["src/**"],
       exclude: [
         "**/index.*",
         "**/__mocks__/**",
@@ -26,6 +26,7 @@ export default defineConfig({
         "**/models/**",
         "**/error.ts",
         "**/*.d.ts",
+        "**/.DS_Store",
       ],
     },
   },
