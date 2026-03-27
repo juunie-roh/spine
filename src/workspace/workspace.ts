@@ -80,7 +80,7 @@ class Workspace {
   trace(filePath: string, offset: Offset) {
     const { ext, cursor, node } = this._syncOffset(filePath, offset);
 
-    const references = this._handler.references(node, ext);
+    const references = new Set(this._handler.references(node, ext));
 
     for (const ref of references) {
       const resolved = cursor.resolve(ref);
@@ -88,8 +88,8 @@ class Workspace {
         console.log(`Unresolved reference: ${ref}`);
       } else {
         console.log(
-          resolved.path.join(" > "),
-          resolved.node.kind,
+          `(${resolved.node.kind})`,
+          `${resolved.name}`,
           "at:",
           "name" in resolved.node.at
             ? `${resolved.node.at.name}(${resolved.node.at.external ?? false})`
