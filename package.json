@@ -101,7 +101,7 @@
     "tsup": "^8.5.1",
     "typedoc": "^0.28.18",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.1"
+    "vitest": "^4.1.2"
   },
   "config": {
     "commitizen": {
