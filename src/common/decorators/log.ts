@@ -7,28 +7,21 @@ namespace Log {
     label?: string;
     message?: string;
   }
-
-  export type Decorator = (
-    target: unknown,
-    context:
-      | ClassDecoratorContext
-      | ClassMethodDecoratorContext
-      | ClassFieldDecoratorContext
-      | ClassAccessorDecoratorContext,
-  ) => any;
 }
 
 /**
  * Factory form: returns a configured decorator.
  * @param options See {@link Log.Options | `Log.Options`}.
  */
-function Log(options: Log.Options): Log.Decorator;
+function Log(
+  options: Log.Options,
+): (target: unknown, context: DecoratorContext) => any;
 
 /** Logs class instantiation via `addInitializer`. `@Log class Foo {}`. */
-function Log<T extends abstract new (...args: any[]) => any>(
-  target: T,
-  context: ClassDecoratorContext<T>,
-): T | void;
+function Log<Class extends abstract new (...args: any[]) => any>(
+  target: Class,
+  context: ClassDecoratorContext<Class>,
+): Class | void;
 
 /** Wraps a method to log invocation and elapsed time. */
 function Log<This, Args extends unknown[], Return>(
@@ -48,41 +41,24 @@ function Log<This, Value>(
   context: ClassAccessorDecoratorContext<This, Value>,
 ): ClassAccessorDecoratorResult<This, Value> | void;
 
-function Log(
-  targetOrOptions: unknown,
-  context?:
-    | ClassDecoratorContext
-    | ClassMethodDecoratorContext
-    | ClassFieldDecoratorContext
-    | ClassAccessorDecoratorContext,
-): unknown {
+function Log(targetOrOptions: unknown, context?: DecoratorContext): unknown {
   if (context === undefined) {
     const options = targetOrOptions as Log.Options;
-    return (
-      target: unknown,
-      ctx:
-        | ClassDecoratorContext
-        | ClassMethodDecoratorContext
-        | ClassFieldDecoratorContext
-        | ClassAccessorDecoratorContext,
-    ) => apply(target, ctx, options);
+    return (target: unknown, ctx: DecoratorContext) =>
+      apply(target, ctx, options);
   }
-  return apply(targetOrOptions, context, {});
+  return apply(targetOrOptions, context);
 }
 
 function apply(
   target: unknown,
-  context:
-    | ClassDecoratorContext
-    | ClassMethodDecoratorContext
-    | ClassFieldDecoratorContext
-    | ClassAccessorDecoratorContext,
-  options: Log.Options,
+  context: DecoratorContext,
+  options?: Log.Options,
 ): unknown {
   const logger = Logger.get();
-  const level = options.level ?? "info";
+  const level = options?.level ?? "info";
   const name = String(context.name ?? "anonymous");
-  const message = options.message;
+  const message = options?.message;
 
   const qualify = (self: unknown): string => {
     const cls = (self as object).constructor?.name;
@@ -100,7 +76,7 @@ function apply(
     case "method":
       const method = target as (...args: unknown[]) => unknown;
       return function (this: unknown, ...args: unknown[]): unknown {
-        const name = options.label ?? qualify(this);
+        const name = options?.label ?? qualify(this);
         logger[level](`${name} called`);
         // check performance only at the "debug" level.
         const s = level === "debug" ? performance.now() : undefined;
