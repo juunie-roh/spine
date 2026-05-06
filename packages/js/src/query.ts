@@ -8,7 +8,6 @@ import iifeAnonymousQueryString from "@/queries/anonymous/iife.scm";
 import whileQueryString from "@/queries/anonymous/while.scm";
 // binding
 import esmBindingQueryString from "@/queries/binding/esm.scm";
-import iifeBindingQueryString from "@/queries/binding/iife.scm";
 import memberQueryString from "@/queries/binding/member.scm";
 import variableQueryString from "@/queries/binding/variable.scm";
 // bypass
@@ -16,6 +15,7 @@ import exportBypassString from "@/queries/bypass/export.scm";
 // scope
 import classQueryString from "@/queries/scope/class.scm";
 import functionQueryString from "@/queries/scope/function.scm";
+import iifeScopeQueryString from "@/queries/scope/iife.scm";
 import methodQueryString from "@/queries/scope/method.scm";
 
 // utility
@@ -30,12 +30,12 @@ export const query = new QueryMap<keyof QueryConfig>(language)
   .set("while", whileQueryString)
   // binding
   .set("esm.binding", esmBindingQueryString)
-  .set("iife.binding", iifeBindingQueryString)
   .set("member", memberQueryString)
   .set("variable", variableQueryString)
   // scope
   .set("class", classQueryString)
   .set("function", functionQueryString)
+  .set("iife.scope", iifeScopeQueryString)
   .set("method", methodQueryString);
 
 export const bypass = new QueryMap<BypassQueryKey>(language).set(

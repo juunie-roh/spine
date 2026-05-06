@@ -17,10 +17,6 @@ export type QueryConfig = {
     required: "source" | "name";
     optional: "alias";
   };
-  "iife.binding": {
-    required: "kind" | "name" | "body";
-    optional: never;
-  };
   member: {
     required: "node" | "name";
     optional: "is_static" | "decorator";
@@ -36,6 +32,10 @@ export type QueryConfig = {
   function: {
     required: "node" | "name" | "params" | "body";
     optional: "is_async";
+  };
+  "iife.scope": {
+    required: "kind" | "name" | "body";
+    optional: never;
   };
   method: {
     required: "node" | "name" | "body" | "params";
