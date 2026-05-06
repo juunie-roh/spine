@@ -5,6 +5,7 @@ import JavaScript from "tree-sitter-javascript";
 // anonymous
 import ifQueryString from "@/queries/anonymous/if.scm";
 import iifeAnonymousQueryString from "@/queries/anonymous/iife.scm";
+import whileQueryString from "@/queries/anonymous/while.scm";
 // binding
 import esmBindingQueryString from "@/queries/binding/esm.scm";
 import iifeBindingQueryString from "@/queries/binding/iife.scm";
@@ -26,6 +27,7 @@ export const query = new QueryMap<keyof QueryConfig>(language)
   // anonymous
   .set("if", ifQueryString)
   .set("iife.anonymous", iifeAnonymousQueryString)
+  .set("while", whileQueryString)
   // binding
   .set("esm.binding", esmBindingQueryString)
   .set("iife.binding", iifeBindingQueryString)

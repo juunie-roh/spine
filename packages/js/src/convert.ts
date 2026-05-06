@@ -1,5 +1,6 @@
 import ifHandler from "./handlers/anonymous/if";
 import iifeHandler from "./handlers/anonymous/iife";
+import whileHandler from "./handlers/anonymous/while";
 import esmBindingHandler from "./handlers/binding/esm";
 import iifeBindingHandler from "./handlers/binding/iife";
 import memberHandler from "./handlers/binding/member";
@@ -12,6 +13,7 @@ import type { ConvertConfig } from "./types";
 export const convertConfig: ConvertConfig = {
   if: ifHandler,
   "iife.anonymous": iifeHandler,
+  while: whileHandler,
   "esm.binding": esmBindingHandler,
   "iife.binding": iifeBindingHandler,
   member: memberHandler,
