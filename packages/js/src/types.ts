@@ -30,8 +30,8 @@ export type QueryConfig = {
     optional: "extends" | "decorator";
   };
   function: {
-    required: "node" | "name" | "params" | "body";
-    optional: "is_async";
+    required: "node" | "name" | "definition.function";
+    optional: never;
   };
   "iife.scope": {
     required: "kind" | "name" | "body";
