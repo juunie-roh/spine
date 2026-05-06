@@ -1,11 +1,12 @@
 import type Parser from "tree-sitter";
 
 const patterns: Record<string, typeof flatPattern> = {
+  // Terminate Conditions of recursion
   identifier: (node, has_default) => [{ name: node.text, node, has_default }],
   shorthand_property_identifier_pattern: (node, has_default) => [
     { name: node.text, node, has_default },
   ],
-
+  // Recurse over single element
   rest_pattern: (node, has_default) =>
     flatPattern(node.firstNamedChild!, has_default),
   assignment_pattern: (node) =>
@@ -14,7 +15,7 @@ const patterns: Record<string, typeof flatPattern> = {
     flatPattern(node.childForFieldName("left")!, true),
   pair_pattern: (node, has_default) =>
     flatPattern(node.childForFieldName("value")!, has_default),
-
+  // Recurse over multiple elements
   array_pattern: (node, has_default) =>
     node.namedChildren.flatMap((c) => flatPattern(c, has_default)),
   object_pattern: (node, has_default) =>
