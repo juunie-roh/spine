@@ -9,10 +9,6 @@ export type QueryConfig = {
     required: "node" | "body";
     optional: never;
   };
-  "cjs.binding": {
-    required: "source" | "name";
-    optional: never;
-  };
   "esm.binding": {
     required: "source" | "name";
     optional: "alias";
